@@ -3,7 +3,6 @@
 Cylinder::Cylinder() {}
 Cylinder::~Cylinder() {}
 
-
 Cylinder::Cylinder(int stacks, int slices, float radius) {
 	//Init cylinder coordinate vectors
 	vertices.clear();

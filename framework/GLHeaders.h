@@ -20,5 +20,6 @@
 #include <glm/gtc/constants.hpp>
 
 using namespace std;
+using namespace glm;
 
 #endif

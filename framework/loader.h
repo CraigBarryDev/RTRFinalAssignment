@@ -2,6 +2,7 @@
 #define LOADER_H
 
 #include "GLHeaders.h"
+#include "model/RawModel.h"
 #include <vector>
 
 class Loader {
@@ -10,9 +11,9 @@ public:
 	~Loader();
 public:
 	void cleanUp();
-	GLuint loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, vector<GLuint> indices);
-	GLuint loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals);
-	GLuint loadToVAO(GLuint vao, vector<GLfloat> positions, vector<GLfloat> normals);
+	RawModel* loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, vector<GLuint> indices);
+	RawModel* loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals);
+	RawModel* loadToVAO(GLuint vao, vector<GLfloat> positions, vector<GLfloat> normals);
 private:
 	GLuint createVAO();
 	void storeDataInAttributeList(GLuint attributeNumber, GLuint coordinateSize, std::vector<GLfloat> data);

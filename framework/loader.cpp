@@ -4,7 +4,7 @@ Loader::Loader() {}
 
 Loader::~Loader() {}
 
-GLuint Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, vector<GLuint> indices) {
+RawModel* Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, vector<GLuint> indices) {
 	//Creates the VAO object and stores its ID in vaoID
 	GLuint vaoID = createVAO();
 	//Store the positional data in the first index of the attribute list of the VAO
@@ -14,42 +14,43 @@ GLuint Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, vec
 	bindIndicesBuffer(indices);
 	//Unbind the VAO from the context
 	unbindVAO();
-	//Return the VAO
-	return vaoID;
+	//Return the model
+	return new RawModel(vaoID, positions.size(), 1.0f);
 }
 
-GLuint Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals) {
+RawModel*  Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals) {
 	//Creates the VAO object and stores its ID in vaoID
 	GLuint vaoID = createVAO();
 	//Store the positional data in the first index of the attribute list of the VAO
-	// storeDataInAttributeList(0, 3, positions);
-	// storeDataInAttributeList(1, 3, normals);
+	storeDataInAttributeList(0, 3, positions);
+	storeDataInAttributeList(1, 3, normals);
 	//Unbind the VAO from the context
 	unbindVAO();
-	//Return the VAO
-	return vaoID;
+	//Return the model
+	return new RawModel(vaoID, positions.size(), 1.0f);
 }
 
-GLuint Loader::loadToVAO(GLuint vao, vector<GLfloat> positions, vector<GLfloat> normals) {
+RawModel*  Loader::loadToVAO(GLuint vao, vector<GLfloat> positions, vector<GLfloat> normals) {
 	//Bind the VAO
-	glBindBuffer(GL_VERTEX_ARRAY, vao);
+	glBindVertexArray(vao);
 	//Store the vertex data in corresponding attribute lists
 	storeDataInAttributeList(0, 3, positions);
 	storeDataInAttributeList(1, 3, normals);
 	//Unbind the vao
 	unbindVAO();
-	//Return the vao that was passed in
-	return vao;
+	//Return the model
+	return new RawModel(vao, positions.size(), 1.0f);
 }
 
 GLuint Loader::createVAO() {
 	//Creates the vao and stores its ID in the vaoID variable
 	GLuint vaoID;
-	glGenBuffers(1, &vaoID);
+	//Generates the VAO
+	glGenVertexArrays(1, &vaoID);
 	//Adds the VAO to the list of vaos
 	vaos.push_back(vaoID);
 	//Binds the VAO to the context
-	glBindBuffer(GL_VERTEX_ARRAY, vaoID);
+	glBindVertexArray(vaoID);
 	//Returns the vaoID
 	return vaoID;
 }
@@ -91,7 +92,7 @@ void Loader::bindIndicesBuffer(std::vector<GLuint> indices) {
 
 void Loader::unbindVAO() {
 	//Unbinds the VAO from the context
-	glBindBuffer(GL_VERTEX_ARRAY, 0);
+	glBindVertexArray(0);
 }
 
 void Loader::cleanUp() {

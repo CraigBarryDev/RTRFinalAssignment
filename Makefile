@@ -3,7 +3,7 @@ LIBS:=-lm -lGL -lGLU -lglut
 BIN:=app
 FLAGS:=-std=c++11
 
-OBJECTS:= cylinder.o framework/camera.o framework/frameTimer.o framework/glGraphics.o framework/keyboard.o framework/loader.o framework/mouse.o framework/shaders.o init.o inputHandler.o main.o shaders/litShader.o
+OBJECTS:= cylinder.o framework/camera.o framework/frameTimer.o framework/glGraphics.o framework/keyboard.o framework/loader.o framework/model/Entity.o framework/model/ModelTexture.o framework/model/RawModel.o framework/model/TexturedModel.o framework/mouse.o framework/shaders.o init.o inputHandler.o main.o shaders/litShader.o
 
 all: $(BIN)
 	./$(BIN)

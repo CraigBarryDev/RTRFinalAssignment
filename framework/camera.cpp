@@ -15,7 +15,7 @@ Camera::Camera() {
 Camera::~Camera() {}
 
 void Camera::rotateWMouse(float sensitivity) {
-	control = rotate;
+	control = rotateCam;
 }
 
 void Camera::panWMouse(float sensitivity) {
@@ -45,7 +45,7 @@ void Camera::updateCamera() {
 		lastY = y;
 
 		switch (control) {
-		case rotate:
+		case rotateCam:
 			rotX += dy;
 			rotY += dx;
 			break;

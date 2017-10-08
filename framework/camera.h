@@ -4,7 +4,7 @@
 #include "GLHeaders.h"
 #include "mouse.h"
 
-typedef enum { inactive, rotate, pan, zoom } CameraControl;
+typedef enum { inactive, rotateCam, pan, zoom } CameraControl;
 
 class Camera {
 public:
