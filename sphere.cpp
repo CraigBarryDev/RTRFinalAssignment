@@ -17,7 +17,7 @@ Sphere::Sphere(int stacks, int slices, float radius) {
 		for (unsigned int i = 0; i <= slices; i++) {
 			//Determine the angle from the centre of the circle
 			float theta = (float)((float)i / (float)(slices)) * (2.0f * 3.1419f);
-			float currSliceAngle = (float)((float)j / (float)(stacks)) * (3.1419f) * 2.0f;
+			float currSliceAngle = (float)((float)j / (float)(stacks)) * (3.1419f);
 			//Generate the points of the circle based on the radius and angle from the centre
 			float x = radius * cosf(theta) * sinf(currSliceAngle);
 			float y = radius * cosf(currSliceAngle);

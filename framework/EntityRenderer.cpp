@@ -61,6 +61,8 @@ void EntityRenderer::prepareTexturedModel(TexturedModel* model) {
 	else
 		enableCulling();
 
+	disableCulling();
+
 }
 
 void EntityRenderer::prepareInstance(Entity* entity) {

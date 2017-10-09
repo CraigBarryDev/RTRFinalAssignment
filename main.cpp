@@ -16,10 +16,84 @@ vec3 ballVelocs[N_BALLS];
 bool statics[N_BALLS];
 const float ballSpeed = 1.0f;
 
+class NSidedPolygon {
+public:
+    NSidedPolygon(unsigned int nSides, float depth, float radius) {
+        float z = depth / 2.0f;
+        int startingIndex = 0;
+
+        for(int i = 0; i < 2; i++) {
+            vertices.push_back(0.0f);
+            vertices.push_back(0.0f);
+            vertices.push_back(z);
+            normals.push_back(0.0f);
+            normals.push_back(0.0f);
+            normals.push_back(startingIndex == 0 ? 1.0f : -1.0f);
+            texCoords.push_back(0.0f);
+            texCoords.push_back(0.0f);
+
+
+            for(int i = 0; i < nSides; i++) {
+                float theta = radians((float)i / (float)nSides * 360.0f);
+                float x = radius * cosf(theta);
+                float y = radius * sinf(theta);
+                vertices.push_back(x);
+                vertices.push_back(y);
+                vertices.push_back(z);
+
+                printf("Vertex <%f, %f, %f>\n", x, y, z);
+                normals.push_back(0.0f);
+                normals.push_back(0.0f);
+                normals.push_back(startingIndex == 0 ? 1.0f : -1.0f);
+                texCoords.push_back(0.0f);
+                texCoords.push_back(0.0f);
+            }
+
+            for(int i = 1; i < nSides; i++) {
+                indices.push_back(startingIndex);
+                indices.push_back(startingIndex + i);
+                indices.push_back(startingIndex + i + 1);
+                printf("Index <%d, %d, %d>\n", startingIndex + 0, startingIndex + i, startingIndex + i + 1);
+            }
+
+            indices.push_back(startingIndex);
+            indices.push_back(startingIndex + nSides);
+            indices.push_back(startingIndex + 1);
+            printf("Index <%d, %d, %d>\n", startingIndex + 0, startingIndex + nSides, startingIndex + 1);
+
+            startingIndex += nSides + 1;
+            z -= depth;
+        }
+        
+        for(int i = 1; i < nSides; i++) {
+            indices.push_back(i);
+            indices.push_back(i + nSides + 1);
+            indices.push_back(i + 1);
+            indices.push_back(i + nSides + 1);
+            indices.push_back(i + nSides + 2);
+            indices.push_back(i + 1);
+        }
+
+        indices.push_back(nSides);
+        indices.push_back(nSides + nSides + 1);
+        indices.push_back(1);
+        indices.push_back(nSides + nSides + 1);
+        indices.push_back(nSides + 2);
+        indices.push_back(1);
+    }
+public:
+    vector<GLfloat> vertices;
+    vector<GLfloat> texCoords;
+    vector<GLfloat> normals;
+    vector<GLuint> indices;
+};
+
 //Main initialization
 void init(void) {
 	//Creates the loading object
 	loader = new Loader();
+
+    NSidedPolygon n = NSidedPolygon(3, 1.0f, 1.0f);
 
 	//Initialize game resources
 	initModels();
@@ -28,8 +102,8 @@ void init(void) {
     Cylinder cylinderMesh = Cylinder(20, 20, 1.0f);
     Sphere sphereMesh = Sphere(20, 20, 1.0f);
     
-    RawModel* model = loader->loadToVAO(sphereMesh.vertices,
-        sphereMesh.normals, sphereMesh.texCoords, sphereMesh.indices);
+    RawModel* model = loader->loadToVAO(n.vertices,
+        n.normals, n.texCoords, n.indices);
 
     woodTexture->setShineDamper(10.0f);
     woodTexture->setReflectivity(0.8f);

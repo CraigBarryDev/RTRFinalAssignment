@@ -16,7 +16,7 @@ RawModel* Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, 
 	//Unbind the VAO from the context
 	unbindVAO();
 	//Return the model
-	return new RawModel(vaoID, positions.size(), 1.0f);
+	return new RawModel(vaoID, indices.size(), 1.0f);
 }
 
 RawModel* Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, vector<GLuint> indices) {
@@ -33,7 +33,7 @@ RawModel* Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, 
 	return new RawModel(vaoID, positions.size(), 1.0f);
 }
 
-RawModel*  Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals) {
+RawModel* Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals) {
 	//Creates the VAO object and stores its ID in vaoID
 	GLuint vaoID = createVAO();
 	//Store the positional data in the first index of the attribute list of the VAO
@@ -45,7 +45,7 @@ RawModel*  Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals)
 	return new RawModel(vaoID, positions.size(), 1.0f);
 }
 
-RawModel*  Loader::loadToVAO(GLuint vao, vector<GLfloat> positions, vector<GLfloat> normals) {
+RawModel* Loader::loadToVAO(GLuint vao, vector<GLfloat> positions, vector<GLfloat> normals) {
 	//Bind the VAO
 	glBindVertexArray(vao);
 	//Store the vertex data in corresponding attribute lists
