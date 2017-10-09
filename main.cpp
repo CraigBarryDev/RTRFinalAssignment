@@ -11,8 +11,9 @@ EntityRenderer renderer;
 Entity* ent1;
 Entity* ent2;
 
-#define N_BALLS 25
+#define N_BALLS 45
 vec3 ballVelocs[N_BALLS];
+bool statics[N_BALLS];
 const float ballSpeed = 1.0f;
 
 //Main initialization
@@ -47,10 +48,18 @@ void init(void) {
         ballVelocs[i] = ballSpeed * normalize(vec3(Maths::randBetweenf(-1.0f, 1.0f), 
             Maths::randBetweenf(-1.0f, 1.0f), 
             0.0f));
-        ballVelocs[i] = ballSpeed * normalize(vec3(Maths::randBetweenf(-1.0f, 1.0f), 
+        if(Maths::randBetween(0,2) == 1) {
+            ballVelocs[i] = ballSpeed * normalize(vec3(Maths::randBetweenf(-1.0f, 1.0f), 
             Maths::randBetweenf(-1.0f, 1.0f), 
             Maths::randBetweenf(-1.0f, 1.0f)));
-        ent->setPosition(vec3(Maths::randBetweenf(-5.0f, 5.0f), Maths::randBetweenf(-5.0f, 5.0f), -15.5f));
+        }else {
+            ballVelocs[i] = vec3(0.0f);
+            statics[i] = true;
+        }
+        
+        ent->setPosition(vec3(Maths::randBetweenf(-5.0f, 5.0f), 
+            Maths::randBetweenf(-5.0f, 5.0f), 
+            Maths::randBetweenf(-5.0f, 5.0f) -17.0f));
     }
 
     std::pair<GLuint, vector<Entity*>> newMapPair(vaoID, entitiesOfSameType);
@@ -58,7 +67,7 @@ void init(void) {
     renderer = EntityRenderer(&staticShader, projMatrix);
 }
 
-bool collisionReaction(vec3* pos1, vec3* vel1, vec3* pos2, vec3* vel2, float collisionDepth) {
+void collisionReaction(vec3* pos1, vec3* vel1, vec3* pos2, vec3* vel2, float collisionDepth) {
     vec3 collisionNormal = normalize(*pos2 - *pos1);
     float initVel1 = dot(*vel1, collisionNormal);
     float initVel2 = dot(*vel2, collisionNormal);
@@ -73,6 +82,12 @@ bool collisionReaction(vec3* pos1, vec3* vel1, vec3* pos2, vec3* vel2, float col
 
     *vel1 = (*vel1 - vec3(initVel1) * collisionNormal) + vec3(finalVel1) * collisionNormal;
     *vel2 = (*vel2 - vec3(initVel2) * collisionNormal) + vec3(finalVel2) * collisionNormal;
+}
+
+void collisionReactionStatic(vec3* pos, vec3* vel, vec3 staticPos, float collisionDepth) {
+    vec3 collisionNormal = normalize(staticPos - *pos);
+    *pos += collisionDepth * collisionNormal;
+    *vel = reflect(*vel, collisionNormal);
 }
 
 //Determines if two balls are colliding or not
@@ -93,17 +108,22 @@ void update(void) {
             Entity* ent2 = entitiesOfSameType[j];
             float collisionDepth = 0.0f;
 
+            //If the balls are colliding
             if(ballsColliding(ent1->getPosition(), ent2->getPosition(), &collisionDepth)) {
-                // printf("BALLS COLLIDING\n");
                 vec3 pos1 = ent1->getPosition();
                 vec3 pos2 = ent2->getPosition();
-                // ent1->increasePosition(-ballVelocs[i] * getFrameTime() * 5.0f);
-                // ent2->increasePosition(-ballVelocs[j] * getFrameTime() * 5.0f);
-                collisionReaction(&pos1, &ballVelocs[i], &pos2, &ballVelocs[j], collisionDepth);
+
+                if(statics[i]) {
+                    collisionReactionStatic(&pos2, &ballVelocs[j], pos1, collisionDepth);
+                }else if(statics[j]) {
+                    collisionReactionStatic(&pos1, &ballVelocs[i], pos2, collisionDepth);
+                }else {
+                    collisionReaction(&pos1, &ballVelocs[i], &pos2, &ballVelocs[j], collisionDepth);
+                }
+                
+                
                 ent1->setPosition(pos1);
                 ent2->setPosition(pos2);
-                // ent1->increasePosition(ballVelocs[i] * getFrameTime() * 5.0f);
-                // ent2->increasePosition(ballVelocs[j] * getFrameTime() * 5.0f);
             }
         }
     }
