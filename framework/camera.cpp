@@ -5,8 +5,8 @@ Camera cam;
 Camera::Camera() {
 	lastX = 0;
 	lastY = 0;
-	rotX = 30.0f;
-	rotY = -30.0f;
+	rotX = 0.0f;
+	rotY = 0.0f;
 	scale = 1.0f;
 	sensitivity = 1.0f;
 	control = inactive;

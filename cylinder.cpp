@@ -15,7 +15,7 @@ Cylinder::Cylinder(int stacks, int slices, float radius) {
 			//Determine the angle from the centre of the circle
 			float theta = (float)((float)i / (float)(slices)) * (2.0f * 3.1419f);
 
-			//Generate the points of the circle based on the redius and angle from the centre
+			//Generate the points of the circle based on the radius and angle from the centre
 			float x = radius * cosf(theta);
 			float y = (((float)j / (float)stacks) - 0.5f) * (radius * 2.0f);
 			float z = radius * sinf(theta);

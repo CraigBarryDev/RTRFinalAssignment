@@ -22,6 +22,10 @@ static void initGlut(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(windowWidth, windowHeight);
 	glutInitWindowPosition(100, 100);
+
+	//Set context to version 3.3 core
+	glutInitContextVersion (3, 3);
+	glutInitContextFlags (GLUT_FORWARD_COMPATIBLE);
 	//Creates window
 	windowID = glutCreateWindow("GLUT Window");
 
@@ -41,15 +45,7 @@ static void windowResize(int width, int height) {
 }
 
 static void setupProjection() {
-	//Sets the matrix mode to deal with projection
-	glMatrixMode(GL_PROJECTION);
-	//Loads the identity matrix
-	glLoadIdentity();
-	//Sets an orthoganl projection from -100 z to 100 z
-	glOrtho(-1.0, 1.0, -1.0, 1.0, -100.0, 100.0);
-
-	//Sets the matrix mode back to dealing with model matrices
-	glMatrixMode(GL_MODELVIEW);
+	
 }
 
 static void glUpdate(void) {
@@ -94,6 +90,7 @@ static void glClose() {
 
 	//Calls user function to cleanup any allocated memory
 	cleanUp();
+
 	//Destroys the window
 	glutDestroyWindow(windowID);
 }

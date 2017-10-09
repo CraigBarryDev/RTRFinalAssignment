@@ -58,6 +58,53 @@ public:
 		//Create the projection matrix
 		return  glm::perspective(radians(fov), aspectRatio, nearPlane, farPlane);
 	}
+
+	static mat4 createViewMatrix(float rx, float ry, vec3 camPos) {
+		mat4 v(1.0f);
+
+		//Rotate the camera first and then translate it (this way you will move in the direction the camera is facing)
+		/*quat r = normalize(quat(radians(cam->getRotation())));
+		mat4 v = mat4_cast(r);*/
+		v = rotate(v, radians(rx), vec3(1.0f, 0.0f, 0.0f));
+		v = rotate(v, radians(ry), vec3(0.0f, 1.0f, 0.0f));
+
+		//Translate the matrix (translate the reverse of the camera position, this way the world will move opposite to the camera)
+		v = translate(v, -camPos);
+		
+		//Return the view matrix
+		return v;
+	}
+
+	//min is inclusive, max is exclusive
+	static int randBetween(int min, int max) {
+		//If values wrong way round, swap them
+		if(min > max) {
+			int temp = min;
+			min = max;
+			max = temp;
+		}
+		//Return random between given values
+		return (rand() % (max - min)) + min;
+	}
+
+	static float randBetweenf(float min, float max) {
+		//If values wrong way round, swap them
+		if(min > max) {
+			float temp = min;
+			min = max;
+			max = temp;
+		}
+		//Return random between 0 and 1
+		float rand1 = (float)rand() / (float)RAND_MAX;
+		//Returns random between given values
+		return (rand1 * (max - min)) + min;
+	}
+
+	//Get the distance between two points
+	static float distBetween(vec3 v1, vec3 v2) {
+		vec3 dv = v2 - v1;
+		return length(dv);
+	}
 };
 
 #endif

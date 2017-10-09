@@ -1,9 +1,9 @@
 CC:=g++
-LIBS:=-lm -lGL -lGLU -lglut
+LIBS:=-lm -lGL -lGLU -lglut ./framework/libSOIL.a
 BIN:=app
 FLAGS:=-std=c++11
 
-OBJECTS:= cylinder.o framework/camera.o framework/frameTimer.o framework/glGraphics.o framework/keyboard.o framework/loader.o framework/model/Entity.o framework/model/ModelTexture.o framework/model/RawModel.o framework/model/TexturedModel.o framework/mouse.o framework/shaders.o init.o inputHandler.o main.o shaders/litShader.o
+OBJECTS:= cylinder.o framework/camera.o framework/EntityRenderer.o framework/frameTimer.o framework/glGraphics.o framework/keyboard.o framework/loader.o framework/model/Entity.o framework/model/ModelTexture.o framework/model/RawModel.o framework/model/TexturedModel.o framework/mouse.o framework/shaders.o framework/shaders/StaticShader.o init.o inputHandler.o main.o sphere.o
 
 all: $(BIN)
 	./$(BIN)
@@ -12,7 +12,7 @@ $(BIN): $(OBJECTS)
 	$(CC) $(FLAGS) -o $(BIN) $(OBJECTS) $(LIBS)
 
 %.o: %.cpp
-	$(CC) $(FLAGS) $(LIBS) -c $< -o $@
+	$(CC) $(FLAGS) -c $< -o $@
 
 remake:
 	make clean

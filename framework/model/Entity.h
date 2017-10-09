@@ -14,6 +14,9 @@ public:
 	//Getters
 	TexturedModel* getModel() { return model; }
 	const vec3 getPosition() { return pos; }
+	const float getPosX() { return pos.x; }
+	const float getPosY() { return pos.y; }
+	const float getPosZ() { return pos.z; }
 	const vec3 getRotation() { return rot; }
 	const float getScale() { return scale; }
 	const float getRadius() { return model->getRawModel()->getModelRadius() * scale; }
@@ -30,6 +33,7 @@ public:
 	void setScale(float scale) { this->scale = scale; }
 	void increasePosition(vec3 dPos) { this->pos += dPos; }
 	void increaseRotation(float rx, float ry, float rz);
+	void increaseRotation(vec3 dRot) { this->rot += dRot; }
 	void setTextureIndex(int texIndex) { this->textureIndex = texIndex; }
 	
 private:
