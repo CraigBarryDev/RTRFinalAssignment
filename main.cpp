@@ -58,7 +58,7 @@ void init(void) {
     renderer = EntityRenderer(&staticShader, projMatrix);
 }
 
-void collisionReaction(vec3* pos1, vec3* vel1, vec3* pos2, vec3* vel2) {
+bool collisionReaction(vec3* pos1, vec3* vel1, vec3* pos2, vec3* vel2, float collisionDepth) {
     vec3 collisionNormal = normalize(*pos2 - *pos1);
     float initVel1 = dot(*vel1, collisionNormal);
     float initVel2 = dot(*vel2, collisionNormal);
@@ -68,13 +68,17 @@ void collisionReaction(vec3* pos1, vec3* vel1, vec3* pos2, vec3* vel2) {
     float finalVel1 = (mass1 - mass2) / (mass1 + mass2) * initVel1 + 2.0f * mass2 / (mass1 + mass2) * initVel2;
     float finalVel2 = 2.0f * mass1 / (mass1 + mass2) * initVel1 + (mass2 - mass1) / (mass1 + mass2) * initVel2;
 
+    *pos1 += (collisionDepth / 2.0f) * collisionNormal;
+    *pos2 -= (collisionDepth / 2.0f) * collisionNormal;
+
     *vel1 = (*vel1 - vec3(initVel1) * collisionNormal) + vec3(finalVel1) * collisionNormal;
     *vel2 = (*vel2 - vec3(initVel2) * collisionNormal) + vec3(finalVel2) * collisionNormal;
 }
 
 //Determines if two balls are colliding or not
-bool ballsColliding(vec3 pos1, vec3 pos2) {
-    return Maths::distBetween(pos1, pos2) <= 2.0f;
+bool ballsColliding(vec3 pos1, vec3 pos2, float* collisionDepth) {
+    *collisionDepth = Maths::distBetween(pos1, pos2) - 2.0f;
+    return *collisionDepth < 0.0f;
 }
 
 
@@ -87,15 +91,19 @@ void update(void) {
         for(int j = i + 1; j < N_BALLS; j++) {
             Entity* ent1 = entitiesOfSameType[i];
             Entity* ent2 = entitiesOfSameType[j];
-            if(ballsColliding(ent1->getPosition(), ent2->getPosition())) {
+            float collisionDepth = 0.0f;
+
+            if(ballsColliding(ent1->getPosition(), ent2->getPosition(), &collisionDepth)) {
                 // printf("BALLS COLLIDING\n");
                 vec3 pos1 = ent1->getPosition();
                 vec3 pos2 = ent2->getPosition();
                 // ent1->increasePosition(-ballVelocs[i] * getFrameTime() * 5.0f);
                 // ent2->increasePosition(-ballVelocs[j] * getFrameTime() * 5.0f);
-                collisionReaction(&pos1, &ballVelocs[i], &pos2, &ballVelocs[j]);
-                ent1->increasePosition(ballVelocs[i] * getFrameTime() * 5.0f);
-                ent2->increasePosition(ballVelocs[j] * getFrameTime() * 5.0f);
+                collisionReaction(&pos1, &ballVelocs[i], &pos2, &ballVelocs[j], collisionDepth);
+                ent1->setPosition(pos1);
+                ent2->setPosition(pos2);
+                // ent1->increasePosition(ballVelocs[i] * getFrameTime() * 5.0f);
+                // ent2->increasePosition(ballVelocs[j] * getFrameTime() * 5.0f);
             }
         }
     }
@@ -114,7 +122,8 @@ void display(void) {
             //Get the entity
             Entity* entity = mapEntry->second[i];
 
-            entity->increaseRotation(vec3(1.0f, 0.5f, 0.7f));
+            // entity->increaseRotation(vec3(1.0f, 0.5f, 0.7f));
+            entity->increaseRotation(ballVelocs[i]);
             entity->increasePosition(ballVelocs[i] * getFrameTime() * 5.0f);
 
             float zWidthAtBall = aspectRatio * tan(projFOV / 2.0f) * abs(2.0f * entity->getPosZ());
