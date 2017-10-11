@@ -22,7 +22,7 @@ public:
         float z = depth / 2.0f;
         int startingIndex = 0;
 
-        for(int i = 0; i < 2; i++) {
+        for(int j = 0; j < 2; j++) {
             vertices.push_back(0.0f);
             vertices.push_back(0.0f);
             vertices.push_back(z);
@@ -64,22 +64,71 @@ public:
             startingIndex += nSides + 1;
             z -= depth;
         }
-        
-        for(int i = 1; i < nSides; i++) {
-            indices.push_back(i);
-            indices.push_back(i + nSides + 1);
-            indices.push_back(i + 1);
-            indices.push_back(i + nSides + 1);
-            indices.push_back(i + nSides + 2);
-            indices.push_back(i + 1);
+
+        z = depth / 2.0f;
+
+        for(int j = 0; j < 2; j++) {
+            for(int i = 0; i < nSides; i++) {
+                float theta = radians((float)i / (float)nSides * 360.0f);
+                float x = radius * cosf(theta);
+                float y = radius * sinf(theta);
+                vertices.push_back(x);
+                vertices.push_back(y);
+                vertices.push_back(z);
+
+                printf("Vertex <%f, %f, %f>\n", x, y, z);
+                normals.push_back(0.0f);
+                normals.push_back(0.0f);
+                normals.push_back(startingIndex == 0 ? 1.0f : -1.0f);
+                texCoords.push_back(0.0f);
+                texCoords.push_back(0.0f);
+            }
+
+            z -= depth;
         }
 
-        indices.push_back(nSides);
-        indices.push_back(nSides + nSides + 1);
-        indices.push_back(1);
-        indices.push_back(nSides + nSides + 1);
-        indices.push_back(nSides + 2);
-        indices.push_back(1);
+        startingIndex -= 2;
+        for(int i = 1; i < nSides; i++) {
+            indices.push_back(startingIndex + i);
+            indices.push_back(startingIndex + i + nSides + 1);
+            indices.push_back(startingIndex + i + 1);
+            indices.push_back(startingIndex + i + nSides + 1);
+            indices.push_back(startingIndex + i + nSides + 2);
+            indices.push_back(startingIndex + i + 1);
+            normals.push_back(0.0f);
+            normals.push_back(1.0f);
+            normals.push_back(0.0f);
+            texCoords.push_back(0.0f);
+            texCoords.push_back(0.0f);
+        }
+
+        indices.push_back(startingIndex + nSides);
+        indices.push_back(startingIndex + nSides + nSides + 1);
+        indices.push_back(startingIndex + 1);
+        indices.push_back(startingIndex + nSides + nSides + 1);
+        indices.push_back(startingIndex + nSides + 2);
+        indices.push_back(startingIndex + 1);
+        normals.push_back(0.0f);
+        normals.push_back(1.0f);
+        normals.push_back(0.0f);
+        texCoords.push_back(0.0f);
+        texCoords.push_back(0.0f);
+    
+        // for(int i = 1; i < nSides; i++) {
+        //     indices.push_back(i);
+        //     indices.push_back(i + nSides + 1);
+        //     indices.push_back(i + 1);
+        //     indices.push_back(i + nSides + 1);
+        //     indices.push_back(i + nSides + 2);
+        //     indices.push_back(i + 1);
+        // }
+
+        // indices.push_back(nSides);
+        // indices.push_back(nSides + nSides + 1);
+        // indices.push_back(1);
+        // indices.push_back(nSides + nSides + 1);
+        // indices.push_back(nSides + 2);
+        // indices.push_back(1);
     }
 public:
     vector<GLfloat> vertices;
@@ -88,12 +137,78 @@ public:
     vector<GLuint> indices;
 };
 
+class NSidedFlatPolygon {
+public:
+    NSidedFlatPolygon(unsigned int nSides, float depth, float radius) {
+        float z = 0;
+
+        vertices.push_back(0.0f);
+        vertices.push_back(0.0f);
+        vertices.push_back(z);
+        normals.push_back(0.0f);
+        normals.push_back(0.0f);
+        normals.push_back(1.0f);
+        texCoords.push_back(0.0f);
+        texCoords.push_back(0.0f);
+
+
+        for(int i = 0; i < nSides; i++) {
+            float theta = radians((float)i / (float)nSides * 360.0f);
+            float x = radius * cosf(theta);
+            float y = radius * sinf(theta);
+            vertices.push_back(x);
+            vertices.push_back(y);
+            vertices.push_back(z);
+            collisionPositions.push_back(vec3(x,y,z));
+
+            printf("Vertex <%f, %f, %f>\n", x, y, z);
+            normals.push_back(0.0f);
+            normals.push_back(0.0f);
+            normals.push_back(1.0f);
+            texCoords.push_back(0.0f);
+            texCoords.push_back(0.0f);
+        }
+
+        for(int i = 0; i < collisionPositions.size(); i++) {
+            vec3 v1, v2, zVec;
+            zVec = vec3(0.0f, 0.0f, 1.0f);
+            v1 = collisionPositions[i];
+            if(i != collisionPositions.size() -1)
+                v2 = collisionPositions[i + 1];
+            else
+                v2 = collisionPositions[0];
+
+            vec3 normal = normalize(cross(v2 - v1, zVec));
+            printf("Normal: <%f, %f, %f>\n", normal.x, normal.y, normal.z);
+            collisionNormals.push_back(normal);
+        }
+
+        for(int i = 1; i < nSides; i++) {
+            indices.push_back(0);
+            indices.push_back(i);
+            indices.push_back(i + 1);
+        }
+
+        indices.push_back(0);
+        indices.push_back(nSides);
+        indices.push_back(1);
+    }
+public:
+    vector<GLfloat> vertices;
+    vector<GLfloat> texCoords;
+    vector<GLfloat> normals;
+    vector<GLuint> indices;
+
+    vector<vec3> collisionNormals;
+    vector<vec3> collisionPositions;
+};
+
 //Main initialization
 void init(void) {
 	//Creates the loading object
 	loader = new Loader();
 
-    NSidedPolygon n = NSidedPolygon(3, 1.0f, 1.0f);
+    NSidedFlatPolygon n = NSidedFlatPolygon(3, 1.0f, 1.0f);
 
 	//Initialize game resources
 	initModels();
@@ -102,8 +217,8 @@ void init(void) {
     Cylinder cylinderMesh = Cylinder(20, 20, 1.0f);
     Sphere sphereMesh = Sphere(20, 20, 1.0f);
     
-    RawModel* model = loader->loadToVAO(n.vertices,
-        n.normals, n.texCoords, n.indices);
+    RawModel* model = loader->loadToVAO(sphereMesh.vertices,
+        sphereMesh.normals, sphereMesh.texCoords, sphereMesh.indices);
 
     woodTexture->setShineDamper(10.0f);
     woodTexture->setReflectivity(0.8f);
@@ -128,7 +243,7 @@ void init(void) {
             Maths::randBetweenf(-1.0f, 1.0f)));
         }else {
             ballVelocs[i] = vec3(0.0f);
-            statics[i] = true;
+            // statics[i] = true;
         }
         
         ent->setPosition(vec3(Maths::randBetweenf(-5.0f, 5.0f), 
@@ -168,6 +283,12 @@ void collisionReactionStatic(vec3* pos, vec3* vel, vec3 staticPos, float collisi
 bool ballsColliding(vec3 pos1, vec3 pos2, float* collisionDepth) {
     *collisionDepth = Maths::distBetween(pos1, pos2) - 2.0f;
     return *collisionDepth < 0.0f;
+}
+
+vector<vec3> spherePolyColliding(vec3 spherePos, float radius, vec3 polyPos, vector<vec3> polySurfaces, vector<vec3> polySurfaceNormals) {
+    for(int i = 0; i < polySurfaces.size() - 1; i++) {
+        vec3 surfacePos = polyPos + polySurfaces[i];
+    }
 }
 
 

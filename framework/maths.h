@@ -105,6 +105,16 @@ public:
 		vec3 dv = v2 - v1;
 		return length(dv);
 	}
+
+	//Vertices should be specified in counter-clockwise winding order
+	//Gets the vector that is perpindicular to the plane
+	static vec3 getPlaneNormal(vec3 v1, vec3 v2, vec3 v3) {
+		//Get vectors from v2 to other points
+		vec3 a1 = v1 - v2;
+		vec3 a2 = v3 - v2;
+
+		return normalize(cross(a2, a1));
+	}
 };
 
 #endif
