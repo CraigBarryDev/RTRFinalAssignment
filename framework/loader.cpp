@@ -30,7 +30,7 @@ RawModel* Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, 
 	//Unbind the VAO from the context
 	unbindVAO();
 	//Return the model
-	return new RawModel(vaoID, positions.size(), 1.0f);
+	return new RawModel(vaoID, indices.size(), 1.0f);
 }
 
 RawModel* Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals) {
@@ -63,7 +63,7 @@ GLuint Loader::createVAO() {
 	//Generates the VAO
 	glGenVertexArrays(1, &vaoID);
 	//Adds the VAO to the list of vaos
-	vaos.push_back(vaoID);
+	// vaos.push_back(vaoID);
 	//Binds the VAO to the context
 	glBindVertexArray(vaoID);
 	//Returns the vaoID
@@ -76,7 +76,7 @@ void Loader::storeDataInAttributeList(GLuint attributeNumber, GLuint coordinateS
 	glGenBuffers(1, &vboID);
 
 	//Adds the VBO to the list of VBOs
-	vbos.push_back(vboID);
+	// vbos.push_back(vboID);
 
 	//Binds the vbo to GL_ARRAY_BUFFER
 	glBindBuffer(GL_ARRAY_BUFFER, vboID);
@@ -98,7 +98,7 @@ void Loader::bindIndicesBuffer(std::vector<GLuint> indices) {
 	GLuint eboID;
 	glGenBuffers(1, &eboID);
 	//Add it to the list of vbos
-	vbos.push_back(eboID);
+	// vbos.push_back(eboID);
 	//Bind the array buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
 	//Bind the element data to the buffer

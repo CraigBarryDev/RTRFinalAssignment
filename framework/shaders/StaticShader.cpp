@@ -23,6 +23,10 @@ void StaticShader::setLightPosition(vec3 lightPos) {
 	setUniform("lightPosition", lightPos);
 }
 
+void StaticShader::setAmbientLight(vec3 ambient) {
+	setUniform("ambient", ambient);
+}
+
 void StaticShader::setLightColor(vec3 lightColor) {
 	setUniform("lightColor", lightColor);
 }

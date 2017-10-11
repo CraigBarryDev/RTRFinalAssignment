@@ -8,6 +8,7 @@ public:
 	StaticShader() {}
 	StaticShader(string vertexFile, string fragmentFile);
 
+	void setAmbientLight(vec3 ambient);
 	void setTransformationMatrix(glm::mat4 mat);
 	void setProjectionMatrix(mat4 mat);
 	void setViewMatrix(mat4 mat);

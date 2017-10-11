@@ -14,14 +14,7 @@ uniform vec3 lightColor;
 uniform float shineDamper;
 uniform float reflection;
 uniform vec3 skyColor;
-
-float near = 1.0; 
-float far  = 100.0; 
-float linearizeDepth(float depth) 
-{
-    float z = depth * 2.0 - 1.0; // Back to NDC 
-    return (2.0 * near * far) / (far + near - z * (far - near));	
-}
+uniform vec3 ambient;
 
 void main() {
 	//Normalizing Normals
@@ -42,21 +35,9 @@ void main() {
 	float dampedSpecBrightness = pow(specDotProd, shineDamper);
 	vec3 specular = dampedSpecBrightness * reflection * lightColor;
 
+	//Get the texture's color
 	vec4 textureColor = texture(textureSampler, pass_textureCoords);
-	if(textureColor.a < 0.5f) {
-		discard;
-	}
 
 	//Final light
-	outColor =  vec4(diffuse,1.0f) * textureColor + vec4(specular, 1.0f);
-	// outColor = vec4(reflection);
-	// outColor = vec4(specular, 1.0f);
-
-	//Mix color with skycolor to produce fog
-	//Mix function takes in two vectors and combines them based on the final parameter
-	//last param 0 = entirely 2nd vector, last param 1 = entirely 1st vector
-	// outColor = mix(vec4(skyColor, 1.0f), outColor, visibility);
-
-	// outColor = textureColor;
-	// outColor = vec4(1.0f,0.0f,0.0f,1.0f);
+	outColor =  (vec4(ambient, 1.0f) + vec4(diffuse,1.0f)) * textureColor + vec4(specular, 1.0f);
 }

@@ -211,19 +211,22 @@ void init(void) {
     NSidedFlatPolygon n = NSidedFlatPolygon(3, 1.0f, 1.0f);
 
 	//Initialize game resources
-	initModels();
-    initShaders();
     initTextures();
+    initShaders();
+    initModels();
+    
     Cylinder cylinderMesh = Cylinder(20, 20, 1.0f);
     Sphere sphereMesh = Sphere(20, 20, 1.0f);
     
     RawModel* model = loader->loadToVAO(sphereMesh.vertices,
         sphereMesh.normals, sphereMesh.texCoords, sphereMesh.indices);
 
-    woodTexture->setShineDamper(10.0f);
-    woodTexture->setReflectivity(0.8f);
+    ballTexture->setShineDamper(10.0f);
+    ballTexture->setReflectivity(0.8f);
+    woodTexture->setShineDamper(25.0f);
+    woodTexture->setReflectivity(0.2f);
 
-    TexturedModel* tm = new TexturedModel(model, woodTexture);
+    TexturedModel* tm = new TexturedModel(model, ballTexture);
     ent1 = new Entity(tm);
     int vaoID = ent1->getModel()->getRawModel()->getVAOID();
 
@@ -243,7 +246,7 @@ void init(void) {
             Maths::randBetweenf(-1.0f, 1.0f)));
         }else {
             ballVelocs[i] = vec3(0.0f);
-            // statics[i] = true;
+            statics[i] = true;
         }
         
         ent->setPosition(vec3(Maths::randBetweenf(-5.0f, 5.0f), 
@@ -327,6 +330,13 @@ void update(void) {
 
 //Called every frame to render objects before the buffers are swapped
 void display(void) {
+    backShader.start();
+    backShader.setShineVariables(woodTexture->getShineDamper(), woodTexture->getReflectivity());
+    backShader.setLightColor(LIGHT_COLOR);
+    backShader.setLightPosition(LIGHT_POS);
+    backShader.setAmbientLight(3.8f * LIGHT_AMBIENT);
+    backdrop.render();
+
     float aspectRatio = (windowWidth / windowHeight) / 2.0f;
 
     //Iterate through each of the maps key/value pairs
@@ -368,8 +378,9 @@ void display(void) {
     staticShader.start();
     staticShader.setProjectionMatrix(Maths::createProjectionMatrix(windowWidth, windowHeight, projFOV, projZNear, projZFar));
     staticShader.setViewMatrix(Maths::createViewMatrix(0.0f, 0.0f, vec3(0.0f, -0.0f, 0.0f)));
-    staticShader.setLightColor(vec3(1.0f, 1.0f, 1.0f));
-    staticShader.setLightPosition(vec3(7.0f, 0.0f, 0.0f));
+    staticShader.setLightColor(LIGHT_COLOR);
+    staticShader.setLightPosition(LIGHT_POS);
+    staticShader.setAmbientLight(0.7f * LIGHT_AMBIENT);
     
 	renderer.render(entities);
 }
