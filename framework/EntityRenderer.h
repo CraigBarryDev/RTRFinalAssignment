@@ -9,7 +9,7 @@ class EntityRenderer {
 public:
 	EntityRenderer() {}
 	EntityRenderer(StaticShader* shader, mat4 projectionMatrix);
-	void render(unordered_map<GLuint, vector<Entity*>>);
+	void render(unordered_map<GLuint, vector<Entity*>*>);
 
 private:
 	void prepareTexturedModel(TexturedModel* model);

@@ -17,6 +17,8 @@
 #define LIGHT_POS vec3(7.0f, 0.0f, 0.0f)
 #define LIGHT_AMBIENT vec3(0.4f)
 
+void addCannonBall(vec3 pos, vec3 vel);
+
 void handleMouse();
 void handleKeyboard();
 

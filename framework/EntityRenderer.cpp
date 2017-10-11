@@ -8,18 +8,18 @@ EntityRenderer::EntityRenderer(StaticShader* shader, mat4 projectionMatrix)
 	shader->stop();
 }
 
-void EntityRenderer::render(unordered_map<GLuint, vector<Entity*>> entitiesMap) {
+void EntityRenderer::render(unordered_map<GLuint, vector<Entity*>*> entitiesMap) {
 	//Iterate through each of the maps key/value pairs
 	for (auto mapEntry = entitiesMap.begin(); mapEntry != entitiesMap.end(); mapEntry++) {
 		//Get the textured model from the entity
-		TexturedModel* texModel = mapEntry->second[0]->getModel();
+		TexturedModel* texModel = mapEntry->second[0][0]->getModel();
 		prepareTexturedModel(texModel);
 
-		const unsigned nEntities = mapEntry->second.size();
+		const unsigned nEntities = mapEntry->second[0].size();
 		//Iterate through the entities in this entity list		
 		for (unsigned int i = 0; i < nEntities; i++) {
 			//Get the entity
-			Entity* entity = mapEntry->second[i];
+			Entity* entity = mapEntry->second[0][i];
 
 			//Prepare each entity for drawing (binding transfromations etc)
 			prepareInstance(entity);

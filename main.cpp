@@ -5,16 +5,16 @@
 #include "framework/loader.h"
 #include "framework/GLHeaders.h"
 
-unordered_map<GLuint, vector<Entity*>> entities;
-std::vector<Entity*> entitiesOfSameType;
+unordered_map<GLuint, vector<Entity*>*> entities;
+std::vector<Entity*> ballEntities;
 std::vector<Entity*> cannonEntities;
 EntityRenderer renderer;
 Entity* ent1;
+TexturedModel* ballTexModel;
 
 #define N_BALLS 3
-vec3 ballVelocs[N_BALLS];
-bool statics[N_BALLS];
-const float ballSpeed = 0.2f;
+vector<vec3> ballVelocs;
+const float ballSpeed = 2.0f;
 
 class NSidedPolygon {
 public:
@@ -226,28 +226,20 @@ void init(void) {
     woodTexture->setShineDamper(25.0f);
     woodTexture->setReflectivity(0.2f);
 
-    TexturedModel* tm = new TexturedModel(model, ballTexture);
-    ent1 = new Entity(tm);
+    ballTexModel = new TexturedModel(model, ballTexture);
+    ent1 = new Entity(ballTexModel);
     int vaoID = ent1->getModel()->getRawModel()->getVAOID();
 
     for(int i = 0; i < N_BALLS; i++) {
-        Entity* ent = new Entity(tm);
+        Entity* ent = new Entity(ballTexModel);
         ent->setPosition(vec3(0.0f, 0.0f, -25.0f));
         ent->setScale(1.0f);
-        entitiesOfSameType.push_back(ent);
+        ballEntities.push_back(ent);
 
         //Set the ball's initial velocity
-        ballVelocs[i] = ballSpeed * normalize(vec3(Maths::randBetweenf(-1.0f, 1.0f), 
+        ballVelocs.push_back(ballSpeed * normalize(vec3(Maths::randBetweenf(-1.0f, 1.0f), 
             Maths::randBetweenf(-1.0f, 1.0f), 
-            0.0f));
-        if(Maths::randBetween(0,2) == 1) {
-            ballVelocs[i] = ballSpeed * normalize(vec3(Maths::randBetweenf(-1.0f, 1.0f), 
-            Maths::randBetweenf(-1.0f, 1.0f), 
-            Maths::randBetweenf(-1.0f, 1.0f)));
-        }else {
-            ballVelocs[i] = vec3(0.0f);
-            // statics[i] = true;
-        }
+            0.0f)));
         
         ent->setPosition(vec3(Maths::randBetweenf(-5.0f, 5.0f), 
             Maths::randBetweenf(-5.0f, 5.0f), 
@@ -256,12 +248,19 @@ void init(void) {
 
     cannon.getEntity()->setPosition(vec3(0.0f, 14.0f, -35.0f));
     cannonEntities.push_back(cannon.getEntity());
-    std::pair<GLuint, vector<Entity*>> cannonPair(cannon.getEntity()->getModel()->getRawModel()->getVAOID(), cannonEntities);
+    std::pair<GLuint, vector<Entity*>*> cannonPair(cannon.getEntity()->getModel()->getRawModel()->getVAOID(), &cannonEntities);
     entities.insert(cannonPair);
 
-    std::pair<GLuint, vector<Entity*>> newMapPair(vaoID, entitiesOfSameType);
+    std::pair<GLuint, vector<Entity*>*> newMapPair(vaoID, &ballEntities);
     entities.insert(newMapPair);
     renderer = EntityRenderer(&staticShader, projMatrix);
+}
+
+void addCannonBall(vec3 pos, vec3 vel) {
+    Entity* ent = new Entity(ballTexModel);
+    ent->setPosition(pos);
+    ballVelocs.push_back(normalize(vel) * ballSpeed);
+    ballEntities.push_back(ent);
 }
 
 void collisionReaction(vec3* pos1, vec3* vel1, vec3* pos2, vec3* vel2, float collisionDepth) {
@@ -305,10 +304,10 @@ void update(void) {
     handleMouse();
     handleKeyboard();
 
-    for(int i = 0; i < N_BALLS; i++) {
-        for(int j = i + 1; j < N_BALLS; j++) {
-            Entity* ent1 = entitiesOfSameType[i];
-            Entity* ent2 = entitiesOfSameType[j];
+    for(int i = 0; i < ballEntities.size(); i++) {
+        for(int j = i + 1; j < ballEntities.size(); j++) {
+            Entity* ent1 = ballEntities[i];
+            Entity* ent2 = ballEntities[j];
             float collisionDepth = 0.0f;
 
             //If the balls are colliding
@@ -316,13 +315,13 @@ void update(void) {
                 vec3 pos1 = ent1->getPosition();
                 vec3 pos2 = ent2->getPosition();
 
-                if(statics[i]) {
-                    collisionReactionStatic(&pos2, &ballVelocs[j], pos1, collisionDepth);
-                }else if(statics[j]) {
-                    collisionReactionStatic(&pos1, &ballVelocs[i], pos2, collisionDepth);
-                }else {
+                // if(statics[i]) {
+                //     collisionReactionStatic(&pos2, &ballVelocs[j], pos1, collisionDepth);
+                // }else if(statics[j]) {
+                //     collisionReactionStatic(&pos1, &ballVelocs[i], pos2, collisionDepth);
+                // }else {
                     collisionReaction(&pos1, &ballVelocs[i], &pos2, &ballVelocs[j], collisionDepth);
-                }
+                // }
                 
                 
                 ent1->setPosition(pos1);
@@ -348,9 +347,9 @@ void display(void) {
     // for (auto mapEntry = entities.begin(); mapEntry != entities.end(); mapEntry++) {
     //     const unsigned nEntities = mapEntry->second.size();
         //Iterate through the entities in this entity list      
-        for (unsigned int i = 0; i < N_BALLS; i++) {
+        for (unsigned int i = 0; i < ballEntities.size(); i++) {
             //Get the entity
-            Entity* entity = entitiesOfSameType[i];
+            Entity* entity = ballEntities[i];
 
             // entity->increaseRotation(vec3(1.0f, 0.5f, 0.7f));
             entity->increaseRotation(ballVelocs[i]);
