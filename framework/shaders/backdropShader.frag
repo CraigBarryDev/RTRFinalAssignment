@@ -38,6 +38,4 @@ void main() {
 
 	//Final light
 	outColor =  (vec4(ambient, 1.0f) + vec4(diffuse,1.0f)) * textureColor + vec4(specular, 1.0f);
-	// outColor = vec4(specular, 1.0f);
-	// outColor = (vec4(ambient,1.0f) + vec4(diffuse, 1.0f)) * textureColor;
 }

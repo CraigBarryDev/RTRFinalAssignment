@@ -2,18 +2,23 @@
 #define MAIN_H
 
 #include "backdrop.h"
+#include "cannon.h"
 #include "cylinder.h"
 #include "sphere.h"
-#include "inputHandler.h"
 
 #include "framework/shaders/StaticShader.h"
 #include "framework/EntityRenderer.h"
 
 #include "framework.h"
 
+#define CANNON_SENSITIVITY 50.0f
+
 #define LIGHT_COLOR vec3(1.0f, 1.0f, 1.0f)
 #define LIGHT_POS vec3(7.0f, 0.0f, 0.0f)
 #define LIGHT_AMBIENT vec3(0.4f)
+
+void handleMouse();
+void handleKeyboard();
 
 void cleanUpModels();
 void cleanUpShaders();
@@ -32,9 +37,11 @@ extern BackdropShader backShader;
 //Textures
 extern ModelTexture* ballTexture;
 extern ModelTexture* woodTexture;
+extern ModelTexture* cannonTexture;
 
 //Models
 extern Backdrop backdrop;
+extern Cannon cannon;
 
 
 #endif

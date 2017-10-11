@@ -9,8 +9,10 @@ BackdropShader backShader;
 //Textures
 ModelTexture* ballTexture;
 ModelTexture* woodTexture;
+ModelTexture* cannonTexture;
 //Models
 Backdrop backdrop;
+Cannon cannon;
 
 //Compiles shaders
 void initShaders() {
@@ -20,27 +22,33 @@ void initShaders() {
 
 //Cleans up shader resources
 void cleanUpShaders() {
+	backShader.cleanUp();
 	staticShader.cleanUp();
 }
 
 //Loads textures
 void initTextures() {
 	ballTexture = new ModelTexture(loader->loadTexture("textures/metal.jpg"));
+	cannonTexture = new ModelTexture(loader->loadTexture("textures/cannon.jpg"));
 	woodTexture = new ModelTexture(loader->loadTexture("textures/wood.png"));
 }
 
 //Unloads textures
 void cleanUpTextures() {
 	delete ballTexture;
+	delete cannonTexture;
 	delete woodTexture;
 }
 
 //Generates/Loads any required models
 void initModels() {
+	//Initializes the backdrop
 	backdrop = Backdrop(loader, woodTexture, &backShader);
+	cannon = Cannon(loader, cannonTexture);
 }
 
 //Cleans up model resources
 void cleanUpModels() {
-	
+	backdrop.cleanUp();
+	cannon.cleanUp();
 }

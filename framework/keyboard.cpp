@@ -21,14 +21,12 @@ void Keyboard::resetKeyEvents() {
 	for(i = 0; i < KEYS_ARR_SIZE; i++) {
 		glKeys->keyDowns[i] = 0;
 		glKeys->keyUps[i] = 0;
-		glKeys->keysPressed[i] = 0;
 	}
 
 	//Re-Initialize special keyboard arrays
 	for(i = 0; i < SKEYS_ARR_SIZE; i++) {
 		glKeys->sKeyDowns[i] = 0;
 		glKeys->sKeyUps[i] = 0;
-		glKeys->sKeysPressed[i] = 0;
 	}
 }
 

@@ -7,14 +7,14 @@
 
 unordered_map<GLuint, vector<Entity*>> entities;
 std::vector<Entity*> entitiesOfSameType;
+std::vector<Entity*> cannonEntities;
 EntityRenderer renderer;
 Entity* ent1;
-Entity* ent2;
 
-#define N_BALLS 45
+#define N_BALLS 3
 vec3 ballVelocs[N_BALLS];
 bool statics[N_BALLS];
-const float ballSpeed = 1.0f;
+const float ballSpeed = 0.2f;
 
 class NSidedPolygon {
 public:
@@ -246,13 +246,18 @@ void init(void) {
             Maths::randBetweenf(-1.0f, 1.0f)));
         }else {
             ballVelocs[i] = vec3(0.0f);
-            statics[i] = true;
+            // statics[i] = true;
         }
         
         ent->setPosition(vec3(Maths::randBetweenf(-5.0f, 5.0f), 
             Maths::randBetweenf(-5.0f, 5.0f), 
             Maths::randBetweenf(-5.0f, 5.0f) -17.0f));
     }
+
+    cannon.getEntity()->setPosition(vec3(0.0f, 14.0f, -35.0f));
+    cannonEntities.push_back(cannon.getEntity());
+    std::pair<GLuint, vector<Entity*>> cannonPair(cannon.getEntity()->getModel()->getRawModel()->getVAOID(), cannonEntities);
+    entities.insert(cannonPair);
 
     std::pair<GLuint, vector<Entity*>> newMapPair(vaoID, entitiesOfSameType);
     entities.insert(newMapPair);
@@ -340,12 +345,12 @@ void display(void) {
     float aspectRatio = (windowWidth / windowHeight) / 2.0f;
 
     //Iterate through each of the maps key/value pairs
-    for (auto mapEntry = entities.begin(); mapEntry != entities.end(); mapEntry++) {
-        const unsigned nEntities = mapEntry->second.size();
+    // for (auto mapEntry = entities.begin(); mapEntry != entities.end(); mapEntry++) {
+    //     const unsigned nEntities = mapEntry->second.size();
         //Iterate through the entities in this entity list      
-        for (unsigned int i = 0; i < nEntities; i++) {
+        for (unsigned int i = 0; i < N_BALLS; i++) {
             //Get the entity
-            Entity* entity = mapEntry->second[i];
+            Entity* entity = entitiesOfSameType[i];
 
             // entity->increaseRotation(vec3(1.0f, 0.5f, 0.7f));
             entity->increaseRotation(ballVelocs[i]);
@@ -372,7 +377,7 @@ void display(void) {
                 ballVelocs[i].z = abs(ballVelocs[i].z);
 
         }
-    }
+    // }
 
 	
     staticShader.start();
