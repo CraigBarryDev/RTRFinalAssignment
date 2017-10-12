@@ -9,28 +9,35 @@ EntityRenderer::EntityRenderer(StaticShader* shader, mat4 projectionMatrix)
 }
 
 void EntityRenderer::render(unordered_map<GLuint, vector<Entity*>*> entitiesMap) {
-	//Iterate through each of the maps key/value pairs
-	for (auto mapEntry = entitiesMap.begin(); mapEntry != entitiesMap.end(); mapEntry++) {
-		//Get the textured model from the entity
-		TexturedModel* texModel = mapEntry->second[0][0]->getModel();
-		prepareTexturedModel(texModel);
+	if(!entitiesMap.empty()) {
+		//Iterate through each of the maps key/value pairs
+		for (auto mapEntry = entitiesMap.begin(); mapEntry != entitiesMap.end(); ++mapEntry) {
+			//If there are no entities, skip to next entitiy list
+			if(mapEntry->second[0].empty())
+				continue;
 
-		const unsigned nEntities = mapEntry->second[0].size();
-		//Iterate through the entities in this entity list		
-		for (unsigned int i = 0; i < nEntities; i++) {
-			//Get the entity
-			Entity* entity = mapEntry->second[0][i];
+			//Get the textured model from the entity
+			TexturedModel* texModel = mapEntry->second[0][0]->getModel();
+			prepareTexturedModel(texModel);
 
-			//Prepare each entity for drawing (binding transfromations etc)
-			prepareInstance(entity);
+			const unsigned nEntities = mapEntry->second[0].size();
+			//Iterate through the entities in this entity list		
+			for (unsigned int i = 0; i < nEntities; i++) {
+				//Get the entity
+				Entity* entity = mapEntry->second[0][i];
 
-			//Draw the model
-			glDrawElements(GL_TRIANGLES, texModel->getRawModel()->getVertexCount(), GL_UNSIGNED_INT, 0);
+				//Prepare each entity for drawing (binding transfromations etc)
+				prepareInstance(entity);
+
+				//Draw the model
+				glDrawElements(GL_TRIANGLES, texModel->getRawModel()->getVertexCount(), GL_UNSIGNED_INT, 0);
+			}
+
+			//Unbind the textured model
+			unbindTexturedModel();
 		}
-
-		//Unbind the textured model
-		unbindTexturedModel();
 	}
+	
 }
 
 void EntityRenderer::prepareTexturedModel(TexturedModel* model) {

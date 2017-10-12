@@ -17,6 +17,9 @@ public:
 	const float getPosX() { return pos.x; }
 	const float getPosY() { return pos.y; }
 	const float getPosZ() { return pos.z; }
+	const float getRotX() { return rot.x; }
+	const float getRotY() { return rot.y;}
+	const float getRotZ() { return rot.z; }
 	const vec3 getRotation() { return rot; }
 	const float getScale() { return scale; }
 	const float getRadius() { return model->getRawModel()->getModelRadius() * scale; }
@@ -30,6 +33,9 @@ public:
 	void setPosY(float y) { this->pos.y = y; }
 	void setPosZ(float z) { this->pos.z = z; }
 	void setRotation(vec3 rot) { this->rot = rot; }
+	void setRotX(float x) { this->rot.x = x; }
+	void setRotY(float y) { this->rot.y = y; }
+	void setRotZ(float z) { this->rot.z = z; }
 	void setScale(float scale) { this->scale = scale; }
 	void increasePosition(vec3 dPos) { this->pos += dPos; }
 	void increaseRotation(float rx, float ry, float rz);

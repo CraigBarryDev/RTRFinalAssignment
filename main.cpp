@@ -10,11 +10,7 @@ std::vector<Entity*> ballEntities;
 std::vector<Entity*> cannonEntities;
 EntityRenderer renderer;
 Entity* ent1;
-TexturedModel* ballTexModel;
-
-#define N_BALLS 3
 vector<vec3> ballVelocs;
-const float ballSpeed = 2.0f;
 
 class NSidedPolygon {
 public:
@@ -215,38 +211,15 @@ void init(void) {
     initShaders();
     initModels();
     
-    Cylinder cylinderMesh = Cylinder(20, 20, 1.0f);
-    Sphere sphereMesh = Sphere(20, 20, 1.0f);
-    
-    RawModel* model = loader->loadToVAO(sphereMesh.vertices,
-        sphereMesh.normals, sphereMesh.texCoords, sphereMesh.indices);
-
     ballTexture->setShineDamper(10.0f);
     ballTexture->setReflectivity(0.8f);
     woodTexture->setShineDamper(25.0f);
     woodTexture->setReflectivity(0.2f);
 
-    ballTexModel = new TexturedModel(model, ballTexture);
-    ent1 = new Entity(ballTexModel);
-    int vaoID = ent1->getModel()->getRawModel()->getVAOID();
+    // ballTexModel = new TexturedModel(model, ballTexture);
+    int vaoID = ballTexModel->getRawModel()->getVAOID();
 
-    for(int i = 0; i < N_BALLS; i++) {
-        Entity* ent = new Entity(ballTexModel);
-        ent->setPosition(vec3(0.0f, 0.0f, -25.0f));
-        ent->setScale(1.0f);
-        ballEntities.push_back(ent);
-
-        //Set the ball's initial velocity
-        ballVelocs.push_back(ballSpeed * normalize(vec3(Maths::randBetweenf(-1.0f, 1.0f), 
-            Maths::randBetweenf(-1.0f, 1.0f), 
-            0.0f)));
-        
-        ent->setPosition(vec3(Maths::randBetweenf(-5.0f, 5.0f), 
-            Maths::randBetweenf(-5.0f, 5.0f), 
-            Maths::randBetweenf(-5.0f, 5.0f) -17.0f));
-    }
-
-    cannon.getEntity()->setPosition(vec3(0.0f, 14.0f, -35.0f));
+    cannon.getEntity()->setPosition(vec3(0.0f, 14.0f, GAME_Z));
     cannonEntities.push_back(cannon.getEntity());
     std::pair<GLuint, vector<Entity*>*> cannonPair(cannon.getEntity()->getModel()->getRawModel()->getVAOID(), &cannonEntities);
     entities.insert(cannonPair);
@@ -259,7 +232,7 @@ void init(void) {
 void addCannonBall(vec3 pos, vec3 vel) {
     Entity* ent = new Entity(ballTexModel);
     ent->setPosition(pos);
-    ballVelocs.push_back(normalize(vel) * ballSpeed);
+    ballVelocs.push_back(normalize(vel) * BALL_SPEED);
     ballEntities.push_back(ent);
 }
 
@@ -292,19 +265,45 @@ bool ballsColliding(vec3 pos1, vec3 pos2, float* collisionDepth) {
     return *collisionDepth < 0.0f;
 }
 
-vector<vec3> spherePolyColliding(vec3 spherePos, float radius, vec3 polyPos, vector<vec3> polySurfaces, vector<vec3> polySurfaceNormals) {
-    for(int i = 0; i < polySurfaces.size() - 1; i++) {
-        vec3 surfacePos = polyPos + polySurfaces[i];
-    }
-}
-
-
 //Update function called before each draw call to update program state
 void update(void) {
     handleMouse();
     handleKeyboard();
 
+    float aspectRatio = (windowWidth / windowHeight) / 2.0f;
+
     for(int i = 0; i < ballEntities.size(); i++) {
+        //Add gravitity to each ball's velocity
+        ballVelocs[i] += getFrameTime() * vec3(0.0f, -GRAVITY_CONST, 0.0f);
+
+        //Get the entity
+        Entity* entity = ballEntities[i];
+
+        // entity->increaseRotation(vec3(1.0f, 0.5f, 0.7f));
+        entity->increaseRotation(ballVelocs[i]);
+        entity->increasePosition(ballVelocs[i] * getFrameTime() * 5.0f);
+
+        float zWidthAtBall = aspectRatio * tan(projFOV / 2.0f) * abs(2.0f * entity->getPosZ());
+        float zHeightAtBall = aspectRatio * tan(projFOV / 2.0f) * abs(2.0f * entity->getPosZ());
+        float minZ = -10.0f;
+        float maxZ = -30.0f;
+
+        if(entity->getPosX() > zWidthAtBall / 2.0f)
+            ballVelocs[i].x = -abs(ballVelocs[i].x);
+        else if(entity->getPosX() < -zWidthAtBall / 2.0f)
+            ballVelocs[i].x = abs(ballVelocs[i].x);
+
+        if(entity->getPosY() > zHeightAtBall / 2.0f)
+            ballVelocs[i].y = -abs(ballVelocs[i].y);
+        else if(entity->getPosY() < -zHeightAtBall / 2.0f)
+            ballVelocs[i].y = abs(ballVelocs[i].y);
+
+        if(entity->getPosZ() > minZ)
+            ballVelocs[i].z = -abs(ballVelocs[i].z);
+        else if(entity->getPosZ() < maxZ)
+            ballVelocs[i].z = abs(ballVelocs[i].z);
+
+        //Check for collisions
         for(int j = i + 1; j < ballEntities.size(); j++) {
             Entity* ent1 = ballEntities[i];
             Entity* ent2 = ballEntities[j];
@@ -315,14 +314,7 @@ void update(void) {
                 vec3 pos1 = ent1->getPosition();
                 vec3 pos2 = ent2->getPosition();
 
-                // if(statics[i]) {
-                //     collisionReactionStatic(&pos2, &ballVelocs[j], pos1, collisionDepth);
-                // }else if(statics[j]) {
-                //     collisionReactionStatic(&pos1, &ballVelocs[i], pos2, collisionDepth);
-                // }else {
-                    collisionReaction(&pos1, &ballVelocs[i], &pos2, &ballVelocs[j], collisionDepth);
-                // }
-                
+                collisionReaction(&pos1, &ballVelocs[i], &pos2, &ballVelocs[j], collisionDepth);         
                 
                 ent1->setPosition(pos1);
                 ent2->setPosition(pos2);
@@ -341,44 +333,6 @@ void display(void) {
     backShader.setAmbientLight(3.8f * LIGHT_AMBIENT);
     backdrop.render();
 
-    float aspectRatio = (windowWidth / windowHeight) / 2.0f;
-
-    //Iterate through each of the maps key/value pairs
-    // for (auto mapEntry = entities.begin(); mapEntry != entities.end(); mapEntry++) {
-    //     const unsigned nEntities = mapEntry->second.size();
-        //Iterate through the entities in this entity list      
-        for (unsigned int i = 0; i < ballEntities.size(); i++) {
-            //Get the entity
-            Entity* entity = ballEntities[i];
-
-            // entity->increaseRotation(vec3(1.0f, 0.5f, 0.7f));
-            entity->increaseRotation(ballVelocs[i]);
-            entity->increasePosition(ballVelocs[i] * getFrameTime() * 5.0f);
-
-            float zWidthAtBall = aspectRatio * tan(projFOV / 2.0f) * abs(2.0f * entity->getPosZ());
-            float zHeightAtBall = aspectRatio * tan(projFOV / 2.0f) * abs(2.0f * entity->getPosZ());
-            float minZ = -10.0f;
-            float maxZ = -30.0f;
-
-            if(entity->getPosX() > zWidthAtBall / 2.0f)
-                ballVelocs[i].x = -abs(ballVelocs[i].x);
-            else if(entity->getPosX() < -zWidthAtBall / 2.0f)
-                ballVelocs[i].x = abs(ballVelocs[i].x);
-
-            if(entity->getPosY() > zHeightAtBall / 2.0f)
-                ballVelocs[i].y = -abs(ballVelocs[i].y);
-            else if(entity->getPosY() < -zHeightAtBall / 2.0f)
-                ballVelocs[i].y = abs(ballVelocs[i].y);
-
-            if(entity->getPosZ() > minZ)
-                ballVelocs[i].z = -abs(ballVelocs[i].z);
-            else if(entity->getPosZ() < maxZ)
-                ballVelocs[i].z = abs(ballVelocs[i].z);
-
-        }
-    // }
-
-	
     staticShader.start();
     staticShader.setProjectionMatrix(Maths::createProjectionMatrix(windowWidth, windowHeight, projFOV, projZNear, projZFar));
     staticShader.setViewMatrix(Maths::createViewMatrix(0.0f, 0.0f, vec3(0.0f, -0.0f, 0.0f)));

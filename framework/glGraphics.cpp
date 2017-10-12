@@ -24,7 +24,7 @@ static void initGlut(int argc, char** argv) {
 	glutInitWindowPosition(100, 100);
 
 	//Set context to version 3.3 core
-	glutInitContextVersion (3, 3);
+	glutInitContextVersion (1, 4);
 	glutInitContextFlags (GLUT_FORWARD_COMPATIBLE);
 	//Creates window
 	windowID = glutCreateWindow("GLUT Window");
