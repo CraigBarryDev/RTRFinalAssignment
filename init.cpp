@@ -2,10 +2,12 @@
 
 //The loader used for loading in models/textures
 extern Loader* loader;
+EntityRenderer renderer;
 
 //Shaders
 StaticShader staticShader;
 BackdropShader backShader;
+
 //Textures
 ModelTexture* ballTexture;
 ModelTexture* blueTexture;
@@ -13,6 +15,7 @@ ModelTexture* greenTexture;
 ModelTexture* orangeTexture;
 ModelTexture* woodTexture;
 ModelTexture* cannonTexture;
+
 //Models
 Backdrop backdrop;
 Cannon cannon;
@@ -26,6 +29,15 @@ RawModel* pegPoly3;
 RawModel* pegPoly4;
 RawModel* pegPoly5;
 RawModel* pegPoly6;
+
+//Entity Lists
+vector<Entity*> ballEntities;
+vector<Entity*> cannonEntities;
+vector<Entity*> peg3Entities;
+vector<Entity*> peg4Entities;
+vector<Entity*> peg5Entities;
+vector<Entity*> peg6Entities;
+unordered_map<GLuint, vector<Entity*>*> entities;
 
 //Compiles shaders
 void initShaders() {
@@ -103,4 +115,34 @@ void cleanUpModels() {
 	delete pegPoly4;
 	delete pegPoly5;
 	delete pegPoly6;
+}
+
+void initRenderer() {
+	//Initialize the entitiy renderer
+    renderer = EntityRenderer(&staticShader, projMatrix);
+
+    //Initialize the cannon
+    cannon.getEntity()->setPosition(vec3(0.0f, 14.0f, GAME_Z));
+    cannonEntities.push_back(cannon.getEntity());
+    std::pair<GLuint, vector<Entity*>*> cannonPair(cannon.getEntity()->getModel()->getRawModel()->getVAOID(), &cannonEntities);
+    entities.insert(cannonPair);
+
+    //Initialize balls
+    int vaoID = ballTexModel->getRawModel()->getVAOID();
+    std::pair<GLuint, vector<Entity*>*> ballPair(vaoID, &ballEntities);
+    entities.insert(ballPair);
+    
+    //Initialize various peg types
+    vaoID = pegPoly3->getVAOID();
+    std::pair<GLuint, vector<Entity*>*> pegPolyPair3(vaoID, &peg3Entities);
+    vaoID = pegPoly4->getVAOID();
+    std::pair<GLuint, vector<Entity*>*> pegPolyPair4(vaoID, &peg4Entities);
+    vaoID = pegPoly5->getVAOID();
+    std::pair<GLuint, vector<Entity*>*> pegPolyPair5(vaoID, &peg5Entities);
+    vaoID = pegPoly6->getVAOID();
+    std::pair<GLuint, vector<Entity*>*> pegPolyPair6(vaoID, &peg6Entities);
+    entities.insert(pegPolyPair3);
+    entities.insert(pegPolyPair4);
+    entities.insert(pegPolyPair5);
+    entities.insert(pegPolyPair6);
 }

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string>
+#include <vector>
 
 //Get the OpenGL function prototypes for core profile functions
 #define GL_GLEXT_PROTOTYPES

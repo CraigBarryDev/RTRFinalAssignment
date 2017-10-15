@@ -3,6 +3,7 @@
 
 #include "backdrop.h"
 #include "cannon.h"
+#include "collisions.h"
 #include "nSidedPolygon.h"
 #include "sphere.h"
 
@@ -38,8 +39,19 @@ void cleanUpTextures();
 void initModels();
 void initShaders();
 void initTextures();
+void initRenderer();
 
 static Loader* loader;
+extern EntityRenderer renderer;
+
+//Entity Lists
+extern std::vector<Entity*> ballEntities;
+extern std::vector<Entity*> cannonEntities;
+extern std::vector<Entity*> peg3Entities;
+extern std::vector<Entity*> peg4Entities;
+extern std::vector<Entity*> peg5Entities;
+extern std::vector<Entity*> peg6Entities;
+extern unordered_map<GLuint, vector<Entity*>*> entities;
 
 //Shaders
 extern StaticShader staticShader;
