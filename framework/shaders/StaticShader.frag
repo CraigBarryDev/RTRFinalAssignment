@@ -15,6 +15,7 @@ uniform float shineDamper;
 uniform float reflection;
 uniform vec3 skyColor;
 uniform vec3 ambient;
+uniform float timeDestroyed;
 
 void main() {
 	//Normalizing Normals
@@ -40,4 +41,6 @@ void main() {
 
 	//Final light
 	outColor =  (vec4(ambient, 1.0f) + vec4(diffuse,1.0f)) * textureColor + vec4(specular, 1.0f);
+
+	outColor = mix(outColor, vec4(1.0f, 0.0f, 0.0f, 1.0f), timeDestroyed);
 }

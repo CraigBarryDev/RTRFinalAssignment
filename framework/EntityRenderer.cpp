@@ -26,6 +26,8 @@ void EntityRenderer::render(unordered_map<GLuint, vector<Entity*>*> entitiesMap)
 			for (unsigned int i = 0; i < nEntities; i++) {
 				//Get the entity
 				Entity* entity = mapEntry->second[0][i];	
+
+				entity->update();
 				
 				//Prepare each entity for drawing (binding transfromations etc)
 				prepareInstance(entity);
@@ -90,6 +92,7 @@ void EntityRenderer::prepareInstance(Entity* entity) {
 	staticShader->setTransformationMatrix(transMatrix);
 
 	staticShader->setTextureAtlasOffsets(entity->getTextureOffset());
+	staticShader->setTimeDestroyed(entity->getTimeDestroyed());
 
 	//Bind the texture to the texture unit 0
 	glActiveTexture(GL_TEXTURE0);

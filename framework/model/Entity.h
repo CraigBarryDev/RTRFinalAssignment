@@ -10,6 +10,7 @@ public:
 	Entity(TexturedModel* model);
 	Entity(TexturedModel* model, vec3 pos, vec3 rot, float scale);
 	void cleanUp();
+	void update();
 
 	//Getters
 	TexturedModel* getModel() { return model; }
@@ -23,6 +24,9 @@ public:
 	const vec3 getRotation() { return rot; }
 	const float getScale() { return scale; }
 	const float getRadius() { return model->getRawModel()->getModelRadius() * scale; }
+	const bool getDestroyed() { return destroyed; }
+	const float getTimeDestroyed() { return timeDestroyed; }
+	const bool shouldBeDisposed() { return timeDestroyed > 1.0f; }
 	vec2 getTextureOffset();
 	mat4 getTransformationMatrix();
 
@@ -41,6 +45,7 @@ public:
 	void increaseRotation(float rx, float ry, float rz);
 	void increaseRotation(vec3 dRot) { this->rot += dRot; }
 	void setTextureIndex(int texIndex) { this->textureIndex = texIndex; }
+	void setDestroyed() { this->destroyed = true; }
 	
 private:
 	void initEntity(TexturedModel* model, vec3 pos, vec3 rot, float scale);
@@ -49,6 +54,8 @@ protected:
 	vec3 pos;
 	vec3 rot;
 	float scale;
+	bool destroyed = false;
+	float timeDestroyed = 0.0f;
 
 	//The index of the texture used in a texture atlast
 	//(if no texture atlas, just use 0)

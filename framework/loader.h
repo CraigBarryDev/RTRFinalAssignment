@@ -14,7 +14,7 @@ public:
 	RawModel* loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, vector<GLfloat> texCoords, vector<GLuint> indices);
 	RawModel* loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, vector<GLfloat> texCoords);
 	RawModel* loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, vector<GLuint> indices);
-	RawModel* loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals);
+	RawModel* loadToVAO(vector<GLfloat> positions, vector<GLfloat> texCoords);
 	RawModel* loadToVAO(GLuint vao, vector<GLfloat> positions, vector<GLfloat> normals);
 	RawModel* loadOBJModel(std::string filename);
 	GLuint loadTexture(std::string filename, bool hasAlphaChannel = false);

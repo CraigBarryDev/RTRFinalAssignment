@@ -1,5 +1,6 @@
 #include "Entity.h"
 #include "../maths.h"
+#include "../frameTimer.h"
 
 Entity::Entity() {}
 
@@ -14,6 +15,12 @@ Entity::Entity(TexturedModel* model, vec3 pos = vec3(0.0f), vec3 rot = vec3(0.0f
 void Entity::cleanUp() {
 	//Delete the memory allocated by the raw model
 	delete model->getRawModel();
+}
+
+void Entity::update() {
+	if(destroyed){
+		timeDestroyed += getFrameTime();
+	}
 }
 
 void Entity::initEntity(TexturedModel* model, vec3 pos, vec3 rot, float scale) {

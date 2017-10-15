@@ -19,6 +19,7 @@ public:
 	void setSkyColour(vec3 skyColor);
 	void setTime(float time);
 	void setUseAnimatedTextures(bool animateTextures);
+	void setTimeDestroyed(float time);
 
 	void setTextureAtlasOffsets(vec2 offsets);
 	void setTextureAtlasSize(vec2 size);

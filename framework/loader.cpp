@@ -46,12 +46,12 @@ RawModel* Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, 
 	return new RawModel(vaoID, indices.size(), 1.0f);
 }
 
-RawModel* Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals) {
+RawModel* Loader::loadToVAO(vector<GLfloat> positions, vector<GLfloat> texCoords) {
 	//Creates the VAO object and stores its ID in vaoID
 	GLuint vaoID = createVAO();
 	//Store the positional data in the first index of the attribute list of the VAO
 	storeDataInAttributeList(0, 3, positions);
-	storeDataInAttributeList(1, 3, normals);
+	storeDataInAttributeList(1, 2, texCoords);
 	//Unbind the VAO from the context
 	unbindVAO();
 	//Return the model

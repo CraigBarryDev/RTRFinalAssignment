@@ -77,25 +77,40 @@ void handlePegCollisions(std::vector<Entity*>* pegs, Entity* ball, int ballIndex
     for(int j = 0; j < pegs->size(); j++) {
         Entity* peg = pegs[0][j];
 
-        vec2 collisionNormal;
-        vec2 pegPos = vec2(peg->getPosX(), peg->getPosY());
-        float pegRot = peg->getRotZ();
-        vec2 ballPos = vec2(ball->getPosX(), ball->getPosY());
-        vec2 ballVel = vec2(ballVelocs[ballIndex].x, ballVelocs[ballIndex].y);
+        //If the peg is not destroyed
+        if(!peg->getDestroyed()) {
+            vec2 collisionNormal;
+            vec2 pegPos = vec2(peg->getPosX(), peg->getPosY());
+            float pegRot = peg->getRotZ();
+            vec2 ballPos = vec2(ball->getPosX(), ball->getPosY());
+            vec2 ballVel = vec2(ballVelocs[ballIndex].x, ballVelocs[ballIndex].y);
 
-        //Is the ball colliding with the peg
-        if(circleCollidingPoly(ballPos, BALL_SIZE, pegPos, pegRot,
-            polyModel.vertices2D, polyModel.normals2D, &collisionNormal)) {
+            //Is the ball colliding with the peg
+            if(circleCollidingPoly(ballPos, BALL_SIZE, pegPos, pegRot,
+                polyModel.vertices2D, polyModel.normals2D, &collisionNormal)) {
 
-            //Perform the collision reaction
-            collisionReactionStatic(&ballPos, &ballVel, pegPos, collisionNormal);
-            ball->setPosX(ballPos.x);
-            ball->setPosY(ballPos.y);
-            ballVelocs[ballIndex].x = ballVel.x;
-            ballVelocs[ballIndex].y = ballVel.y;
+                //Perform the collision reaction
+                collisionReactionStatic(&ballPos, &ballVel, pegPos, collisionNormal);
+                ball->setPosX(ballPos.x);
+                ball->setPosY(ballPos.y);
+                ballVelocs[ballIndex].x = ballVel.x;
+                ballVelocs[ballIndex].y = ballVel.y;
 
+                peg->setDestroyed();
+                
+            }
+        }
+    }
+}
+
+void disposeDestroyedPegs(std::vector<Entity*>* pegs) {
+    for(int j = 0; j < pegs->size(); j++) {
+        Entity* peg = pegs[0][j];
+
+        //If the peg is read to be disposed, dispose it
+        if(peg->shouldBeDisposed()) {
             //Remove the peg as it has now been destroyed
-            pegs[0].erase(pegs->begin() + j);
+            pegs->erase(pegs->begin() + j);
             //Decrement loop otherwise we will skip a peg
             j--;
         }
@@ -163,6 +178,11 @@ void update(void) {
         handlePegCollisions(&peg5Entities, ball, i, pegPolyModel5);
         handlePegCollisions(&peg6Entities, ball, i, pegPolyModel6);
     }
+
+    disposeDestroyedPegs(&peg3Entities);
+    disposeDestroyedPegs(&peg4Entities);
+    disposeDestroyedPegs(&peg5Entities);
+    disposeDestroyedPegs(&peg6Entities);
 
     for(int i = 0; i < pegs.size(); i++) {
         pegs[i].update();

@@ -60,6 +60,10 @@ void StaticShader::setUseAnimatedTextures(bool animateTextures) {
 	setUniform("useAnimatedTextures", animateTextures);
 }
 
+void StaticShader::setTimeDestroyed(float time) {
+	setUniform("timeDestroyed", time);
+}
+
 void StaticShader::bindAttributes() {
 	bindAttribute(0, "position");
 	bindAttribute(1, "textureCoords");
