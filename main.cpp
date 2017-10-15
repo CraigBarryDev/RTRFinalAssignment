@@ -5,228 +5,86 @@
 #include "framework/loader.h"
 #include "framework/GLHeaders.h"
 
-unordered_map<GLuint, vector<Entity*>*> entities;
+
 std::vector<Entity*> ballEntities;
 std::vector<Entity*> cannonEntities;
+std::vector<Entity*> peg3Entities;
+std::vector<Entity*> peg4Entities;
+std::vector<Entity*> peg5Entities;
+std::vector<Entity*> peg6Entities;
 EntityRenderer renderer;
-Entity* ent1;
+unordered_map<GLuint, vector<Entity*>*> entities;
 vector<vec3> ballVelocs;
-
-class NSidedPolygon {
-public:
-    NSidedPolygon(unsigned int nSides, float depth, float radius) {
-        float z = depth / 2.0f;
-        int startingIndex = 0;
-
-        for(int j = 0; j < 2; j++) {
-            vertices.push_back(0.0f);
-            vertices.push_back(0.0f);
-            vertices.push_back(z);
-            normals.push_back(0.0f);
-            normals.push_back(0.0f);
-            normals.push_back(startingIndex == 0 ? 1.0f : -1.0f);
-            texCoords.push_back(0.0f);
-            texCoords.push_back(0.0f);
-
-
-            for(int i = 0; i < nSides; i++) {
-                float theta = radians((float)i / (float)nSides * 360.0f);
-                float x = radius * cosf(theta);
-                float y = radius * sinf(theta);
-                vertices.push_back(x);
-                vertices.push_back(y);
-                vertices.push_back(z);
-
-                printf("Vertex <%f, %f, %f>\n", x, y, z);
-                normals.push_back(0.0f);
-                normals.push_back(0.0f);
-                normals.push_back(startingIndex == 0 ? 1.0f : -1.0f);
-                texCoords.push_back(0.0f);
-                texCoords.push_back(0.0f);
-            }
-
-            for(int i = 1; i < nSides; i++) {
-                indices.push_back(startingIndex);
-                indices.push_back(startingIndex + i);
-                indices.push_back(startingIndex + i + 1);
-                printf("Index <%d, %d, %d>\n", startingIndex + 0, startingIndex + i, startingIndex + i + 1);
-            }
-
-            indices.push_back(startingIndex);
-            indices.push_back(startingIndex + nSides);
-            indices.push_back(startingIndex + 1);
-            printf("Index <%d, %d, %d>\n", startingIndex + 0, startingIndex + nSides, startingIndex + 1);
-
-            startingIndex += nSides + 1;
-            z -= depth;
-        }
-
-        z = depth / 2.0f;
-
-        for(int j = 0; j < 2; j++) {
-            for(int i = 0; i < nSides; i++) {
-                float theta = radians((float)i / (float)nSides * 360.0f);
-                float x = radius * cosf(theta);
-                float y = radius * sinf(theta);
-                vertices.push_back(x);
-                vertices.push_back(y);
-                vertices.push_back(z);
-
-                printf("Vertex <%f, %f, %f>\n", x, y, z);
-                normals.push_back(0.0f);
-                normals.push_back(0.0f);
-                normals.push_back(startingIndex == 0 ? 1.0f : -1.0f);
-                texCoords.push_back(0.0f);
-                texCoords.push_back(0.0f);
-            }
-
-            z -= depth;
-        }
-
-        startingIndex -= 2;
-        for(int i = 1; i < nSides; i++) {
-            indices.push_back(startingIndex + i);
-            indices.push_back(startingIndex + i + nSides + 1);
-            indices.push_back(startingIndex + i + 1);
-            indices.push_back(startingIndex + i + nSides + 1);
-            indices.push_back(startingIndex + i + nSides + 2);
-            indices.push_back(startingIndex + i + 1);
-            normals.push_back(0.0f);
-            normals.push_back(1.0f);
-            normals.push_back(0.0f);
-            texCoords.push_back(0.0f);
-            texCoords.push_back(0.0f);
-        }
-
-        indices.push_back(startingIndex + nSides);
-        indices.push_back(startingIndex + nSides + nSides + 1);
-        indices.push_back(startingIndex + 1);
-        indices.push_back(startingIndex + nSides + nSides + 1);
-        indices.push_back(startingIndex + nSides + 2);
-        indices.push_back(startingIndex + 1);
-        normals.push_back(0.0f);
-        normals.push_back(1.0f);
-        normals.push_back(0.0f);
-        texCoords.push_back(0.0f);
-        texCoords.push_back(0.0f);
-    
-        // for(int i = 1; i < nSides; i++) {
-        //     indices.push_back(i);
-        //     indices.push_back(i + nSides + 1);
-        //     indices.push_back(i + 1);
-        //     indices.push_back(i + nSides + 1);
-        //     indices.push_back(i + nSides + 2);
-        //     indices.push_back(i + 1);
-        // }
-
-        // indices.push_back(nSides);
-        // indices.push_back(nSides + nSides + 1);
-        // indices.push_back(1);
-        // indices.push_back(nSides + nSides + 1);
-        // indices.push_back(nSides + 2);
-        // indices.push_back(1);
-    }
-public:
-    vector<GLfloat> vertices;
-    vector<GLfloat> texCoords;
-    vector<GLfloat> normals;
-    vector<GLuint> indices;
-};
-
-class NSidedFlatPolygon {
-public:
-    NSidedFlatPolygon(unsigned int nSides, float depth, float radius) {
-        float z = 0;
-
-        vertices.push_back(0.0f);
-        vertices.push_back(0.0f);
-        vertices.push_back(z);
-        normals.push_back(0.0f);
-        normals.push_back(0.0f);
-        normals.push_back(1.0f);
-        texCoords.push_back(0.0f);
-        texCoords.push_back(0.0f);
-
-
-        for(int i = 0; i < nSides; i++) {
-            float theta = radians((float)i / (float)nSides * 360.0f);
-            float x = radius * cosf(theta);
-            float y = radius * sinf(theta);
-            vertices.push_back(x);
-            vertices.push_back(y);
-            vertices.push_back(z);
-            collisionPositions.push_back(vec3(x,y,z));
-
-            printf("Vertex <%f, %f, %f>\n", x, y, z);
-            normals.push_back(0.0f);
-            normals.push_back(0.0f);
-            normals.push_back(1.0f);
-            texCoords.push_back(0.0f);
-            texCoords.push_back(0.0f);
-        }
-
-        for(int i = 0; i < collisionPositions.size(); i++) {
-            vec3 v1, v2, zVec;
-            zVec = vec3(0.0f, 0.0f, 1.0f);
-            v1 = collisionPositions[i];
-            if(i != collisionPositions.size() -1)
-                v2 = collisionPositions[i + 1];
-            else
-                v2 = collisionPositions[0];
-
-            vec3 normal = normalize(cross(v2 - v1, zVec));
-            printf("Normal: <%f, %f, %f>\n", normal.x, normal.y, normal.z);
-            collisionNormals.push_back(normal);
-        }
-
-        for(int i = 1; i < nSides; i++) {
-            indices.push_back(0);
-            indices.push_back(i);
-            indices.push_back(i + 1);
-        }
-
-        indices.push_back(0);
-        indices.push_back(nSides);
-        indices.push_back(1);
-    }
-public:
-    vector<GLfloat> vertices;
-    vector<GLfloat> texCoords;
-    vector<GLfloat> normals;
-    vector<GLuint> indices;
-
-    vector<vec3> collisionNormals;
-    vector<vec3> collisionPositions;
-};
 
 //Main initialization
 void init(void) {
 	//Creates the loading object
 	loader = new Loader();
 
-    NSidedFlatPolygon n = NSidedFlatPolygon(3, 1.0f, 1.0f);
-
 	//Initialize game resources
     initTextures();
     initShaders();
     initModels();
-    
-    ballTexture->setShineDamper(10.0f);
-    ballTexture->setReflectivity(0.8f);
-    woodTexture->setShineDamper(25.0f);
-    woodTexture->setReflectivity(0.2f);
 
-    // ballTexModel = new TexturedModel(model, ballTexture);
-    int vaoID = ballTexModel->getRawModel()->getVAOID();
+    //Initialize the entitiy renderer
+    renderer = EntityRenderer(&staticShader, projMatrix);
 
+    //Initialize
     cannon.getEntity()->setPosition(vec3(0.0f, 14.0f, GAME_Z));
     cannonEntities.push_back(cannon.getEntity());
     std::pair<GLuint, vector<Entity*>*> cannonPair(cannon.getEntity()->getModel()->getRawModel()->getVAOID(), &cannonEntities);
     entities.insert(cannonPair);
 
+    int vaoID = ballTexModel->getRawModel()->getVAOID();
     std::pair<GLuint, vector<Entity*>*> newMapPair(vaoID, &ballEntities);
     entities.insert(newMapPair);
-    renderer = EntityRenderer(&staticShader, projMatrix);
+    
+    vaoID = pegPoly3->getVAOID();
+    std::pair<GLuint, vector<Entity*>*> pegPolyPair3(vaoID, &peg3Entities);
+    vaoID = pegPoly4->getVAOID();
+    std::pair<GLuint, vector<Entity*>*> pegPolyPair4(vaoID, &peg4Entities);
+    vaoID = pegPoly5->getVAOID();
+    std::pair<GLuint, vector<Entity*>*> pegPolyPair5(vaoID, &peg5Entities);
+    vaoID = pegPoly6->getVAOID();
+    std::pair<GLuint, vector<Entity*>*> pegPolyPair6(vaoID, &peg6Entities);
+    entities.insert(pegPolyPair3);
+    entities.insert(pegPolyPair4);
+    entities.insert(pegPolyPair5);
+    entities.insert(pegPolyPair6);
+}
+
+void addPeg(vec3 pos) {
+    int nSides = Maths::randBetween(3,7);
+    nSides =3;
+    RawModel* raw;
+    switch(nSides) {
+        case 3:
+            raw = pegPoly3; break;
+        case 4:
+            raw = pegPoly4; break;
+        case 5:
+            raw = pegPoly5; break;
+        case 6:
+            raw = pegPoly6; break;
+    }
+    
+    printf("VAO ID: %d\n", raw->getVAOID());
+    TexturedModel* polyTexModel = new TexturedModel(raw, woodTexture);
+    Entity* ent = new Entity(polyTexModel);
+    ent->setPosition(pos);
+
+    switch(nSides) {
+        case 3:
+            peg3Entities.push_back(ent); break;
+        case 4:
+            peg4Entities.push_back(ent); break;
+        case 5:
+            peg5Entities.push_back(ent); break;
+        case 6:
+            peg6Entities.push_back(ent); break;
+    }
+
+    printf("PEG ENTITIY ADDED\n");
 }
 
 void addCannonBall(vec3 pos, vec3 vel) {
@@ -259,10 +117,87 @@ void collisionReactionStatic(vec3* pos, vec3* vel, vec3 staticPos, float collisi
     *vel = reflect(*vel, collisionNormal);
 }
 
+void sphereCollisionReactionStatic(vec2* pos, vec2* vel, vec2 staticPos, float collisionDepth) {
+    vec2 collisionNormal = normalize(staticPos - *pos);
+    *pos += collisionDepth * collisionNormal;
+    *vel = reflect(*vel, collisionNormal);
+    // *vel = -collisionNormal * BALL_SPEED;
+}
+
+void collisionReactionStatic(vec2* pos, vec2* vel, vec2 staticPos, vec2 collisionNormal) {
+    *vel = reflect(*vel, collisionNormal);
+}
+
 //Determines if two balls are colliding or not
 bool ballsColliding(vec3 pos1, vec3 pos2, float* collisionDepth) {
     *collisionDepth = Maths::distBetween(pos1, pos2) - 2.0f;
     return *collisionDepth < 0.0f;
+}
+
+bool circleCollidingVertex(vec2 cPos, float cRadius, vec2 v, vec2* collisionNormal) {
+    //Get the vector from the vertex to the circle
+    vec2 vecBetween = cPos - v;
+    //Get the distance between the circle centre and the vertex
+    float dist = length(vecBetween);
+
+    //Determine if they are colliding
+    if(dist < cRadius) {
+        //Determine the collision normal
+        *collisionNormal = normalize(vecBetween);
+        //Return that a collision has occured
+        return true;
+    }
+
+    //Return that no collision has occured
+    return false;
+}
+
+bool circleCollidingLine(vec2 cPos, float cRadius, vec2 l1, vec2 l2, vec2 normal, vec2* collisionNormal) {
+    //Gets the midpoint of the line segment
+    vec2 midPoint = l1 + (0.5f * (l2 - l1));
+    //Gets the vector from the midpoint of the line to the centre of the circle
+    vec2 midToCircle = cPos - midPoint;
+    //Gets the length of the line segment
+    float lineSegLength = length(l2 - l1);
+    //Projects the to circle vector across the surface normal
+    vec2 normProjection = proj(midToCircle, normal);
+    float distFromLine = length(normProjection);
+    //Projects the to circle vector across the line segment
+    vec2 vecProjection = proj(midToCircle, l2 - l1);
+    float distFromMid = length(vecProjection);
+
+    //If the circle centre is one the same plane as the line segment
+    if(distFromMid < lineSegLength / 2.0f) {
+        
+        //If the distance from the line is less than the radius of the circle
+        if(distFromLine < cRadius) { 
+            //The collision normal will be the surface's normal
+            *collisionNormal = normal;
+            //A collision has occured
+            return true;
+        }
+
+        //If it is not close enough, there is no collsion
+        return false;
+    }else {
+        //The only way the circle can collide with the line outside the plane,
+        //is if it collides with one of the vertices
+        return circleCollidingVertex(cPos, cRadius, l1, collisionNormal) ||
+                circleCollidingVertex(cPos, cRadius, l2, collisionNormal);
+    }
+}
+
+//Determines if a circle is colliding with a polygon
+bool circleCollidingPoly(vec2 cPos, float cRadius, vec2 posOffset, vector<vec2> vertices, vector<vec2> normals, vec2* collisionNormal) {
+    //Iterate through each of the polygons vertices
+    for(int i = 0; i < vertices.size() - 1; i++) {
+        //If the circle is colliding with this edge of the polygon
+        if(circleCollidingLine(cPos, cRadius, posOffset + vertices[i], posOffset + vertices[i + 1], normals[i], collisionNormal))
+            //Then there is a collision occuring
+            return true;
+    }
+
+    return false;
 }
 
 //Update function called before each draw call to update program state
@@ -278,30 +213,24 @@ void update(void) {
 
         //Get the entity
         Entity* entity = ballEntities[i];
-
-        // entity->increaseRotation(vec3(1.0f, 0.5f, 0.7f));
         entity->increaseRotation(ballVelocs[i]);
         entity->increasePosition(ballVelocs[i] * getFrameTime() * 5.0f);
 
         float zWidthAtBall = aspectRatio * tan(projFOV / 2.0f) * abs(2.0f * entity->getPosZ());
         float zHeightAtBall = aspectRatio * tan(projFOV / 2.0f) * abs(2.0f * entity->getPosZ());
-        float minZ = -10.0f;
-        float maxZ = -30.0f;
 
-        if(entity->getPosX() > zWidthAtBall / 2.0f)
+        if(entity->getPosX() > zWidthAtBall)
             ballVelocs[i].x = -abs(ballVelocs[i].x);
-        else if(entity->getPosX() < -zWidthAtBall / 2.0f)
+        else if(entity->getPosX() < -zWidthAtBall)
             ballVelocs[i].x = abs(ballVelocs[i].x);
 
-        if(entity->getPosY() > zHeightAtBall / 2.0f)
+        if(entity->getPosY() > zHeightAtBall)
             ballVelocs[i].y = -abs(ballVelocs[i].y);
-        else if(entity->getPosY() < -zHeightAtBall / 2.0f)
+        else if(entity->getPosY() < -zHeightAtBall){
             ballVelocs[i].y = abs(ballVelocs[i].y);
-
-        if(entity->getPosZ() > minZ)
-            ballVelocs[i].z = -abs(ballVelocs[i].z);
-        else if(entity->getPosZ() < maxZ)
-            ballVelocs[i].z = abs(ballVelocs[i].z);
+            ballVelocs.erase(ballVelocs.begin() + i);
+            ballEntities.erase(ballEntities.begin() + i);
+        }
 
         //Check for collisions
         for(int j = i + 1; j < ballEntities.size(); j++) {
@@ -319,6 +248,96 @@ void update(void) {
                 ent1->setPosition(pos1);
                 ent2->setPosition(pos2);
             }
+        }
+    }
+
+    for(int i = 0; i < ballEntities.size(); i++) {
+        Entity* ball = ballEntities[i];
+
+        for(int j = 0; j < peg3Entities.size(); j++) {
+            Entity* peg = peg3Entities[j];
+
+            vec2 collisionNormal;
+            vec2 pegPos = vec2(peg->getPosX(), peg->getPosY());
+            vec2 ballPos = vec2(ball->getPosX(), ball->getPosY());
+            vec2 ballVel = vec2(ballVelocs[i].x, ballVelocs[i].y);
+
+            if(circleCollidingPoly(ballPos, BALL_SIZE, pegPos, pegPolyModel3.vertices2D, 
+                pegPolyModel3.normals2D, &collisionNormal)) {
+
+                    collisionReactionStatic(&ballPos, &ballVel, pegPos, collisionNormal);
+                    ball->setPosX(ballPos.x);
+                    ball->setPosY(ballPos.y);
+                    ballVelocs[i].x = ballVel.x;
+                    ballVelocs[i].y = ballVel.y;
+
+                    //Remove the peg
+                    peg3Entities.erase(peg3Entities.begin() + j);
+                    j--;
+            }
+            // for(int k = 0; k < pegPolyModel3.vertices2D.size() - 1; k++) {
+                
+
+
+                
+
+                // if(circleCollidingVertex(ballPos,
+                //     BALL_SIZE,
+                //     pegPos + pegPolyModel3.vertices2D[k],
+                //     &collisionNormal)) {
+
+                //     printf("CollisionNormal: <%f, %f>\n", collisionNormal.x, collisionNormal.y);
+
+                //     collisionReactionStatic(&ballPos, &ballVel, pegPos, collisionNormal);
+                //     ball->setPosX(ballPos.x);
+                //     ball->setPosY(ballPos.y);
+                //     ballVelocs[i].x = ballVel.x;
+                //     ballVelocs[i].y = ballVel.y;
+
+                //     printf("REMOVING PEG (%d)\n", j);
+
+                //     //Remove the peg
+                //     peg3Entities.erase(peg3Entities.begin() + j);
+                //     j--;
+
+                //     printf("PEG REMOVED\n");
+                //     break;
+                // }
+
+            //     if(circleCollidingLine(ballPos, BALL_SIZE, 
+            //         pegPos + pegPolyModel3.vertices2D[k],
+            //         pegPos + pegPolyModel3.vertices2D[k + 1],
+            //         pegPolyModel3.normals2D[k],
+            //         &collisionNormal)) {
+
+            //         printf("CollisionNormal: <%f, %f>\n", collisionNormal.x, collisionNormal.y);
+
+            //         collisionReactionStatic(&ballPos, &ballVel, pegPos, collisionNormal);
+            //         ball->setPosX(ballPos.x);
+            //         ball->setPosY(ballPos.y);
+            //         ballVelocs[i].x = ballVel.x;
+            //         ballVelocs[i].y = ballVel.y;
+
+            //         printf("REMOVING PEG (%d)\n", j);
+
+            //         //Remove the peg
+            //         peg3Entities.erase(peg3Entities.begin() + j);
+            //         j--;
+
+            //         printf("PEG REMOVED\n");
+            //         break;
+            //     }
+            // }
+            
+            // vec2 collisionNormal;
+            // if(circleCollidingPoly(vec2(ball->getPosition().x, ball->getPosition().y),
+            //     BALL_SIZE,
+            //     pegPolyModel3.vertices2D,
+            //     pegPolyModel3.normals2D,
+            //     &collisionNormal)) {
+
+            //     printf("CollisionNormal: <%f, %f>\n", collisionNormal.x, collisionNormal.y);
+            // }
         }
     }
 }

@@ -29,8 +29,15 @@ void EntityRenderer::render(unordered_map<GLuint, vector<Entity*>*> entitiesMap)
 				//Prepare each entity for drawing (binding transfromations etc)
 				prepareInstance(entity);
 
-				//Draw the model
-				glDrawElements(GL_TRIANGLES, texModel->getRawModel()->getVertexCount(), GL_UNSIGNED_INT, 0);
+				//If the model has indices
+				if(texModel->getRawModel()->hasIndices()) {
+					//Draw the model with an index buffer
+					glDrawElements(GL_TRIANGLES, texModel->getRawModel()->getVertexCount(), GL_UNSIGNED_INT, 0);
+				}else {
+					//Draw the model without an index buffer
+					glDrawArrays(GL_TRIANGLES, 0, texModel->getRawModel()->getVertexCount() / 3);
+				}
+				
 			}
 
 			//Unbind the textured model

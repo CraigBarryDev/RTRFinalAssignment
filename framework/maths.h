@@ -100,9 +100,15 @@ public:
 		return (rand1 * (max - min)) + min;
 	}
 
-	//Get the distance between two points
+	//Get the distance between two 3D points
 	static float distBetween(vec3 v1, vec3 v2) {
 		vec3 dv = v2 - v1;
+		return length(dv);
+	}
+
+	//Get the distance between two 2D points
+	static float distBetween(vec2 v1, vec2 v2) {
+		vec2 dv = v2 - v1;
 		return length(dv);
 	}
 

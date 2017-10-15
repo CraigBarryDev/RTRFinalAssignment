@@ -22,9 +22,12 @@ void handleKeyboard() {
     		cannon.getEntity()->setRotZ(MAX_CANNON_ROTATION);
     }
     if(glKeys->keyUpEvent(' ')) {
-    	float xSpeed = sinf(radians(cannon.getEntity()->getRotation().z));
-    	float ySpeed = cosf(radians(cannon.getEntity()->getRotation().z));
+    	float xSpeed = -sinf(radians(-cannon.getEntity()->getRotation().z));
+    	float ySpeed = -cosf(radians(-cannon.getEntity()->getRotation().z));
     	
     	addCannonBall(cannon.getEntity()->getPosition(), vec3(xSpeed, ySpeed, 0.0f));
+    }
+    if(glKeys->keyUpEvent('s')) {
+        addPeg(vec3(Maths::randBetweenf(-18.0f, 18.0f), Maths::randBetweenf(-15.0f, 5.0f), GAME_Z));
     }
 }

@@ -12,6 +12,7 @@ public:
 public:
 	void cleanUp();
 	RawModel* loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, vector<GLfloat> texCoords, vector<GLuint> indices);
+	RawModel* loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, vector<GLfloat> texCoords);
 	RawModel* loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals, vector<GLuint> indices);
 	RawModel* loadToVAO(vector<GLfloat> positions, vector<GLfloat> normals);
 	RawModel* loadToVAO(GLuint vao, vector<GLfloat> positions, vector<GLfloat> normals);
