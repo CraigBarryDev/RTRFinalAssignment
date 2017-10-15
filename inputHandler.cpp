@@ -1,7 +1,7 @@
 #include "main.h"
 
 void printControls() {
-    printf("******************************\n");
+    printf("\n******************************\n");
     printf(" PEGGLE - RTR ASSIGNMENT 3\n");
     printf("******************************\n");
     printf("-----------Controls-----------\n");
@@ -10,7 +10,7 @@ void printControls() {
     printf("Space:     Fires ball\n");
     printf("S:         Adds a random peg\n");
     printf("R:         Resets the level\n");
-    printf("------------------------------\n");
+    printf("------------------------------\n\n");
 }
 
 void handleMouse() {}

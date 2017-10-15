@@ -228,12 +228,14 @@ void update(void) {
         handlePegCollisions(&peg6Entities, ball, i, pegPolyModel6);
     }
 
+    //Dispose any items that need to be disposed
     disposeDestroyedPegs(&peg3Entities);
     disposeDestroyedPegs(&peg4Entities);
     disposeDestroyedPegs(&peg5Entities);
     disposeDestroyedPegs(&peg6Entities);
     disposeParticleSystems();
 
+    //Iterate through each peg and update its position
     for(int i = 0; i < pegs.size(); i++) {
         pegs[i].update();
     }
@@ -250,9 +252,13 @@ void display(void) {
     //Render the backdrop
     backdrop.render();
 
+    //Calculate the view/projection matrices
+    mat4 projMatrix = Maths::createProjectionMatrix(windowWidth, windowHeight, projFOV, projZNear, projZFar);
+    mat4 viewMatrix = Maths::createViewMatrix(0.0f, 0.0f, vec3(0.0f, -0.0f, 0.0f));
+
     particleShader.start();
-    particleShader.setProjectionMatrix(Maths::createProjectionMatrix(windowWidth, windowHeight, projFOV, projZNear, projZFar));
-    particleShader.setViewMatrix(Maths::createViewMatrix(0.0f, 0.0f, vec3(0.0f, -0.0f, 0.0f)));
+    particleShader.setProjectionMatrix(projMatrix);
+    particleShader.setViewMatrix(viewMatrix);
     //Iterate through each of the particle systems
     for(int i = 0; i < particleSystems.size(); i++) {
         //Render the particle system
@@ -260,8 +266,8 @@ void display(void) {
     }
 
     staticShader.start();
-    staticShader.setProjectionMatrix(Maths::createProjectionMatrix(windowWidth, windowHeight, projFOV, projZNear, projZFar));
-    staticShader.setViewMatrix(Maths::createViewMatrix(0.0f, 0.0f, vec3(0.0f, -0.0f, 0.0f)));
+    staticShader.setProjectionMatrix(projMatrix);
+    staticShader.setViewMatrix(viewMatrix);
     staticShader.setLightColor(LIGHT_COLOR);
     staticShader.setLightPosition(LIGHT_POS);
     staticShader.setAmbientLight(0.7f * LIGHT_AMBIENT);
