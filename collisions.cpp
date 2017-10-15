@@ -97,10 +97,11 @@ bool circleCollidingPoly(vec2 cPos, float cRadius, vec2 posOffset, float rotZ, v
     //Iterate through each of the polygons vertices
     for(int i = 0; i < vertices.size() - 1; i++) {
         //Translate and Rotate the input vertices
-        vec2 v1 = rotate(vertices[i], rotZ) + posOffset;
-        vec2 v2 = rotate(vertices[i + 1], rotZ) + posOffset;
+        vec2 v1 = rotate(vertices[i], radians(rotZ)) + posOffset;
+        vec2 v2 = rotate(vertices[i + 1], radians(rotZ)) + posOffset;
+        vec2 normal = rotate(normals[i], radians(rotZ));
         //If the circle is colliding with this edge of the polygon
-        if(circleCollidingLine(cPos, cRadius, v1, v2, normals[i], collisionNormal))
+        if(circleCollidingLine(cPos, cRadius, v1, v2, normal, collisionNormal))
             //Then there is a collision occuring
             return true;
     }

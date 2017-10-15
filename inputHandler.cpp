@@ -26,6 +26,7 @@ void handleKeyboard() {
     	addCannonBall(cannon.getEntity()->getPosition(), vec3(xSpeed, ySpeed, 0.0f));
     }
     if(glKeys->keyUpEvent('s')) {
-        addPeg(vec3(Maths::randBetweenf(-18.0f, 18.0f), Maths::randBetweenf(-15.0f, 5.0f), GAME_Z));
+        addPeg(vec3(Maths::randBetweenf(-18.0f, 18.0f), Maths::randBetweenf(-15.0f, 5.0f), GAME_Z),
+            vec3(0.0f, 0.0f, Maths::randBetweenf(-30.0f, 30.0f)));
     }
 }

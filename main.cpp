@@ -6,6 +6,7 @@
 #include "framework/GLHeaders.h"
 
 vector<vec3> ballVelocs;
+vector<Peg> pegs;
 
 //Main initialization
 void init(void) {
@@ -19,7 +20,7 @@ void init(void) {
     initRenderer();
 }
 
-void addPeg(vec3 pos) {
+void addPeg(vec3 pos, vec3 angularVeloc) {
     int nSides = Maths::randBetween(3,7);
     int texture = Maths::randBetween(0,3);
     ModelTexture* tex;
@@ -59,6 +60,10 @@ void addPeg(vec3 pos) {
         case 6:
             peg6Entities.push_back(ent); break;
     }
+
+    Peg peg = Peg(ent);
+    peg.setAngularVeloc(angularVeloc);
+    pegs.push_back(peg);
 }
 
 void addCannonBall(vec3 pos, vec3 vel) {
@@ -157,6 +162,10 @@ void update(void) {
         handlePegCollisions(&peg4Entities, ball, i, pegPolyModel4);
         handlePegCollisions(&peg5Entities, ball, i, pegPolyModel5);
         handlePegCollisions(&peg6Entities, ball, i, pegPolyModel6);
+    }
+
+    for(int i = 0; i < pegs.size(); i++) {
+        pegs[i].update();
     }
 }
 

@@ -3,7 +3,10 @@
 NSidedPolygon::NSidedPolygon() 
 {}
 
-NSidedPolygon::NSidedPolygon(unsigned int nSides, float depth, float radius) {
+NSidedPolygon::NSidedPolygon(unsigned int nSides, float depth, float radius)
+	:
+nSides(nSides)
+{
     float z1 = depth / 2.0f;
     float z2 = -depth / 2.0f;
     int startingIndex = 0;

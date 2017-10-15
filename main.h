@@ -6,6 +6,7 @@
 #include "collisions.h"
 #include "nSidedPolygon.h"
 #include "sphere.h"
+#include "peg.h"
 
 #include "framework/shaders/StaticShader.h"
 #include "framework/EntityRenderer.h"
@@ -27,7 +28,7 @@
 #define BALL_SIZE 0.9f
 
 void addCannonBall(vec3 pos, vec3 vel);
-void addPeg(vec3 pos);
+void addPeg(vec3 pos, vec3 angularVeloc);
 
 void handleMouse();
 void handleKeyboard();
