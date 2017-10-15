@@ -31,7 +31,17 @@ texture(particleTexture)
 	vecAdd(&texCoords, vec2(0.0f, 0.0f));
 	vecAdd(&texCoords, vec2(1.0f, 0.0f));
 
-	pModel = loader->loadToVAO(verts, texCoords);
+	vector<GLuint> indices;
+	indices.push_back(0);
+	indices.push_back(1);
+	indices.push_back(2);
+	
+	indices.push_back(3);
+	indices.push_back(0);
+	indices.push_back(2);
+
+	pModel = loader->loadToVAO(verts, texCoords, indices);
+	vao = pModel->getVAOID();
 
 	for(int i = 0; i < nParticles; i++) {
 		Particle p = Particle();
@@ -45,6 +55,10 @@ texture(particleTexture)
 }
 
 Particles::~Particles() {}
+
+void Particles::cleanUp() {
+	delete pModel;
+}
 
 void Particles::render() 
 {
@@ -65,13 +79,24 @@ void Particles::render()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture->getTextureID());
 
-	//SET RUNNING TIME
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	//Set the running time of the particle system
+	shader.setRunningTime(runningTime);
 
 	for(int i = 0; i < particles.size(); i++) {
-		//SET PARTICLE SPEED
+		//Set the particles pos/velocity
+		shader.setParticlePos(particles[i].pos);
+		shader.setParticleVeloc(particles[i].veloc);
 		//Draw the model
-		glDrawArrays(GL_QUADS, 0, 4);
+		glDrawElements(GL_TRIANGLES, pModel->getVertexCount(), GL_UNSIGNED_INT, 0);
 	}
+
+	glDisable(GL_BLEND);
+
+	//Update the running time
+	runningTime += getFrameTime();
 
 	//Disable the attribute lists from the VAO
 	glDisableVertexAttribArray(0);

@@ -6,6 +6,7 @@
 #include "collisions.h"
 #include "nSidedPolygon.h"
 #include "sphere.h"
+#include "particles.h"
 #include "peg.h"
 
 #include "framework/shaders/StaticShader.h"
@@ -57,6 +58,7 @@ extern unordered_map<GLuint, vector<Entity*>*> entities;
 //Shaders
 extern StaticShader staticShader;
 extern BackdropShader backShader;
+extern ParticleShader particleShader;
 
 //Textures
 extern ModelTexture* ballTexture;
@@ -65,6 +67,7 @@ extern ModelTexture* cannonTexture;
 extern ModelTexture* blueTexture;
 extern ModelTexture* greenTexture;
 extern ModelTexture* orangeTexture;
+extern ModelTexture* particleTexture;
 
 //Models
 extern Backdrop backdrop;
@@ -78,6 +81,5 @@ extern RawModel* pegPoly3;
 extern RawModel* pegPoly4;
 extern RawModel* pegPoly5;
 extern RawModel* pegPoly6;
-
 
 #endif

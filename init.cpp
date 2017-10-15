@@ -7,6 +7,7 @@ EntityRenderer renderer;
 //Shaders
 StaticShader staticShader;
 BackdropShader backShader;
+ParticleShader particleShader;
 
 //Textures
 ModelTexture* ballTexture;
@@ -15,6 +16,7 @@ ModelTexture* greenTexture;
 ModelTexture* orangeTexture;
 ModelTexture* woodTexture;
 ModelTexture* cannonTexture;
+ModelTexture* particleTexture;
 
 //Models
 Backdrop backdrop;
@@ -43,12 +45,14 @@ unordered_map<GLuint, vector<Entity*>*> entities;
 void initShaders() {
 	backShader = BackdropShader("framework/shaders/backdropShader.vert", "framework/shaders/backdropShader.frag");
 	staticShader = StaticShader("framework/shaders/StaticShader.vert", "framework/shaders/StaticShader.frag");
+	particleShader = ParticleShader("framework/shaders/ParticleShader.vert", "framework/shaders/ParticleShader.frag");
 }
 
 //Cleans up shader resources
 void cleanUpShaders() {
 	backShader.cleanUp();
 	staticShader.cleanUp();
+	particleShader.cleanUp();
 }
 
 //Loads textures
@@ -67,6 +71,9 @@ void initTextures() {
 
 	orangeTexture = new ModelTexture(loader->loadTexture("textures/orange.jpg"));
 	orangeTexture->setIsAnimated(true);
+
+	particleTexture = new ModelTexture(loader->loadTexture("textures/red_particle.png", true));
+	particleTexture->setHasTransparency(true);
 
 	woodTexture = new ModelTexture(loader->loadTexture("textures/wood.png"));
 	woodTexture->setShineDamper(25.0f);

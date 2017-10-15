@@ -3,7 +3,7 @@
 void handleMouse() {}
 
 void handleKeyboard() {
-    if(glKeys->isPressed('a')){
+    if(glKeys->isPressed('a') || glKeys->isSpecialKeyPressed(SPECIAL_KEY_LEFT)){
     	//Rotate the cannon to the left
     	cannon.getEntity()->increaseRotation(0.0f, 0.0f, -CANNON_SENSITIVITY * getFrameTime());
 
@@ -11,7 +11,7 @@ void handleKeyboard() {
     	if(cannon.getEntity()->getRotZ() < MIN_CANNON_ROTATION)
     		cannon.getEntity()->setRotZ(MIN_CANNON_ROTATION);
     }
-    if(glKeys->isPressed('d')){
+    if(glKeys->isPressed('d') || glKeys->isSpecialKeyPressed(SPECIAL_KEY_RIGHT)){
     	//Rotate the cannon to the right
     	cannon.getEntity()->increaseRotation(0.0f, 0.0f, CANNON_SENSITIVITY * getFrameTime());
 

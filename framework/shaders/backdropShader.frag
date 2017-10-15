@@ -1,4 +1,4 @@
-#version 140
+#version 330 core
 
 in vec2 frag_texCoords;
 in vec3 frag_normal;

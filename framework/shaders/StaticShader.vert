@@ -1,4 +1,4 @@
-#version 140
+#version 330 core
 
 in vec3 position;
 in vec2 textureCoords;
@@ -39,7 +39,6 @@ void main() {
 		if(textureCoords.x > 0.0f && textureCoords.y > 0.0f) {
 			float x = mod(time, 6.24);
 			pass_textureCoords = vec2(0.1f * (sin(textureCoords * x * 0.2f)));
-			// pass_textureCoords = vec2(time - floor(time));
 		}else {
 			pass_textureCoords = textureCoords;
 		}

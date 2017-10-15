@@ -14,6 +14,8 @@
 #define MAX_PARTICLE_SIZE 2.0f
 #define MIN_PARTICLE_SIZE 1.0f
 
+#define MAX_RUNNING_TIME 1.0f
+
 class Particle {
 public:
 	Particle() {}
@@ -29,6 +31,8 @@ public:
 	Particles(Loader* loader, int nParticles, ModelTexture* particleTexture, ParticleShader shader, vec3 srcPos);
 	~Particles();
 	void render();
+	void cleanUp();
+	const bool finished() { return runningTime > MAX_RUNNING_TIME; }
 private:
 	GLuint vao;
 	vec3 srcPos;
@@ -36,7 +40,7 @@ private:
 	vector<Particle> particles;
 	ModelTexture* texture;
 	RawModel* pModel;
-	float runningTime = 0.0f;
+	float runningTime = 0.2f;
 };
 
 

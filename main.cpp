@@ -7,6 +7,7 @@
 
 vector<vec3> ballVelocs;
 vector<Peg> pegs;
+vector<Particles> particleSystems;
 
 //Main initialization
 void init(void) {
@@ -73,6 +74,11 @@ void addCannonBall(vec3 pos, vec3 vel) {
     ballEntities.push_back(ent);
 }
 
+void startExplosion(vec3 pos) {
+    Particles p = Particles(loader, 100, particleTexture, particleShader, pos);
+    particleSystems.push_back(p);
+}
+
 void handlePegCollisions(std::vector<Entity*>* pegs, Entity* ball, int ballIndex, NSidedPolygon& polyModel) {
     for(int j = 0; j < pegs->size(); j++) {
         Entity* peg = pegs[0][j];
@@ -97,7 +103,6 @@ void handlePegCollisions(std::vector<Entity*>* pegs, Entity* ball, int ballIndex
                 ballVelocs[ballIndex].y = ballVel.y;
 
                 peg->setDestroyed();
-                
             }
         }
     }
@@ -109,10 +114,25 @@ void disposeDestroyedPegs(std::vector<Entity*>* pegs) {
 
         //If the peg is read to be disposed, dispose it
         if(peg->shouldBeDisposed()) {
+            startExplosion(peg->getPosition());
             //Remove the peg as it has now been destroyed
             pegs->erase(pegs->begin() + j);
             //Decrement loop otherwise we will skip a peg
             j--;
+        }
+    }
+}
+
+void disposeParticleSystems() {
+    for(int i = 0; i < particleSystems.size(); i++) {
+        //If the particle system is finished
+        if(particleSystems[i].finished()) {
+            //Cleanup particle system resources
+            particleSystems[i].cleanUp();
+            //Destroy the particle system
+            particleSystems.erase(particleSystems.begin() + i);
+            //Decrement loop to not skip a particle system
+            i--;
         }
     }
 }
@@ -183,6 +203,7 @@ void update(void) {
     disposeDestroyedPegs(&peg4Entities);
     disposeDestroyedPegs(&peg5Entities);
     disposeDestroyedPegs(&peg6Entities);
+    disposeParticleSystems();
 
     for(int i = 0; i < pegs.size(); i++) {
         pegs[i].update();
@@ -199,6 +220,15 @@ void display(void) {
     backShader.setAmbientLight(3.8f * LIGHT_AMBIENT);
     //Render the backdrop
     backdrop.render();
+
+    particleShader.start();
+    particleShader.setProjectionMatrix(Maths::createProjectionMatrix(windowWidth, windowHeight, projFOV, projZNear, projZFar));
+    particleShader.setViewMatrix(Maths::createViewMatrix(0.0f, 0.0f, vec3(0.0f, -0.0f, 0.0f)));
+    //Iterate through each of the particle systems
+    for(int i = 0; i < particleSystems.size(); i++) {
+        //Render the particle system
+        particleSystems[i].render();
+    }
 
     staticShader.start();
     staticShader.setProjectionMatrix(Maths::createProjectionMatrix(windowWidth, windowHeight, projFOV, projZNear, projZFar));
