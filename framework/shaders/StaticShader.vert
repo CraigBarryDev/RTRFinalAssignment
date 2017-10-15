@@ -19,6 +19,9 @@ uniform vec2 texAtlasPos;
 uniform vec2 texAtlasSize;
 uniform int useFakeLighting;
 
+uniform float time;
+uniform int useAnimatedTextures;
+
 const float density = 0.007;
 const float gradient = 0.8;
 
@@ -30,7 +33,17 @@ void main() {
 	//view space
 	gl_Position = projectionMatrix * posRelativeToCamera;
 
-	pass_textureCoords = textureCoords / texAtlasSize + texAtlasPos;
+	if(useAnimatedTextures == 0) {
+		pass_textureCoords = textureCoords / texAtlasSize + texAtlasPos;
+	}else {
+		if(textureCoords.x > 0.0f && textureCoords.y > 0.0f) {
+			float x = mod(time, 6.24);
+			pass_textureCoords = vec2(0.1f * (sin(textureCoords * x * 0.2f)));
+			// pass_textureCoords = vec2(time - floor(time));
+		}else {
+			pass_textureCoords = textureCoords;
+		}
+	}
 
 	vec3 tempNormal = normal;
 	if(useFakeLighting == 1) {

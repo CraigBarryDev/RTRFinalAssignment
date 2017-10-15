@@ -49,6 +49,9 @@ extern BackdropShader backShader;
 extern ModelTexture* ballTexture;
 extern ModelTexture* woodTexture;
 extern ModelTexture* cannonTexture;
+extern ModelTexture* blueTexture;
+extern ModelTexture* greenTexture;
+extern ModelTexture* orangeTexture;
 
 //Models
 extern Backdrop backdrop;

@@ -55,7 +55,20 @@ void init(void) {
 
 void addPeg(vec3 pos) {
     int nSides = Maths::randBetween(3,7);
+    // srand(time(NULL));
+    int texture = Maths::randBetween(0,3);
+    ModelTexture* tex;
     RawModel* raw;
+
+    switch(texture) {
+        case 0:
+            tex = blueTexture; break;
+        case 1:
+            tex = greenTexture; break;
+        case 2:
+            tex = orangeTexture; break;
+    }
+   
     switch(nSides) {
         case 3:
             raw = pegPoly3; break;
@@ -67,7 +80,7 @@ void addPeg(vec3 pos) {
             raw = pegPoly6; break;
     }
     
-    TexturedModel* polyTexModel = new TexturedModel(raw, woodTexture);
+    TexturedModel* polyTexModel = new TexturedModel(raw, tex);
     Entity* ent = new Entity(polyTexModel);
     ent->setPosition(pos);
 
@@ -183,11 +196,14 @@ bool circleCollidingLine(vec2 cPos, float cRadius, vec2 l1, vec2 l2, vec2 normal
 }
 
 //Determines if a circle is colliding with a polygon
-bool circleCollidingPoly(vec2 cPos, float cRadius, vec2 posOffset, vector<vec2> vertices, vector<vec2> normals, vec2* collisionNormal) {
+bool circleCollidingPoly(vec2 cPos, float cRadius, vec2 posOffset, float rotZ, vector<vec2> vertices, vector<vec2> normals, vec2* collisionNormal) {
     //Iterate through each of the polygons vertices
     for(int i = 0; i < vertices.size() - 1; i++) {
+        //Translate and Rotate the input vertices
+        vec2 v1 = rotate(vertices[i], rotZ) + posOffset;
+        vec2 v2 = rotate(vertices[i + 1], rotZ) + posOffset;
         //If the circle is colliding with this edge of the polygon
-        if(circleCollidingLine(cPos, cRadius, posOffset + vertices[i], posOffset + vertices[i + 1], normals[i], collisionNormal))
+        if(circleCollidingLine(cPos, cRadius, v1, v2, normals[i], collisionNormal))
             //Then there is a collision occuring
             return true;
     }
@@ -201,11 +217,13 @@ void handlePegCollisions(std::vector<Entity*>* pegs, Entity* ball, int ballIndex
 
         vec2 collisionNormal;
         vec2 pegPos = vec2(peg->getPosX(), peg->getPosY());
+        float pegRot = peg->getRotZ();
         vec2 ballPos = vec2(ball->getPosX(), ball->getPosY());
         vec2 ballVel = vec2(ballVelocs[ballIndex].x, ballVelocs[ballIndex].y);
 
-        if(circleCollidingPoly(ballPos, BALL_SIZE, pegPos, polyModel.vertices2D, 
-            polyModel.normals2D, &collisionNormal)) {
+        //Is the ball colliding with the peg
+        if(circleCollidingPoly(ballPos, BALL_SIZE, pegPos, pegRot,
+            polyModel.vertices2D, polyModel.normals2D, &collisionNormal)) {
 
             //Perform the collision reaction
             collisionReactionStatic(&ballPos, &ballVel, pegPos, collisionNormal);
@@ -214,8 +232,9 @@ void handlePegCollisions(std::vector<Entity*>* pegs, Entity* ball, int ballIndex
             ballVelocs[ballIndex].x = ballVel.x;
             ballVelocs[ballIndex].y = ballVel.y;
 
-            //Remove the peg
+            //Remove the peg as it has now been destroyed
             pegs[0].erase(pegs->begin() + j);
+            //Decrement loop otherwise we will skip a peg
             j--;
         }
     }
@@ -226,28 +245,33 @@ void update(void) {
     handleMouse();
     handleKeyboard();
 
-    float aspectRatio = (windowWidth / windowHeight) / 2.0f;
+    //Calculate the window's aspect ration
+    float aspectRatio = (windowWidth / windowHeight);
 
+    //Iterate through each ball
     for(int i = 0; i < ballEntities.size(); i++) {
         //Add gravitity to each ball's velocity
         ballVelocs[i] += getFrameTime() * vec3(0.0f, -GRAVITY_CONST, 0.0f);
 
         //Get the entity
-        Entity* entity = ballEntities[i];
-        entity->increaseRotation(ballVelocs[i]);
-        entity->increasePosition(ballVelocs[i] * getFrameTime() * 5.0f);
+        Entity* ball = ballEntities[i];
+        //Rotate the ball by its velocity (not physically accurate, but looks fine)
+        ball->increaseRotation(ballVelocs[i]);
+        //Move the ball by its velocity over the given timeframe
+        ball->increasePosition(ballVelocs[i] * getFrameTime() * 5.0f);
 
-        float zWidthAtBall = aspectRatio * tan(projFOV / 2.0f) * abs(2.0f * entity->getPosZ());
-        float zHeightAtBall = aspectRatio * tan(projFOV / 2.0f) * abs(2.0f * entity->getPosZ());
+        float zWidthAtBall = 0.5f * aspectRatio * tan(projFOV / 2.0f) * abs(2.0f * ball->getPosZ());
+        //Height not entirely accurate, but close enough for its purpose
+        float zHeightAtBall = 0.5f * aspectRatio * tan(projFOV / 2.0f) * abs(2.0f * ball->getPosZ());
 
-        if(entity->getPosX() > zWidthAtBall)
+        //Handle collisions with side walls
+        if(ball->getPosX() + BALL_SIZE > zWidthAtBall)
             ballVelocs[i].x = -abs(ballVelocs[i].x);
-        else if(entity->getPosX() < -zWidthAtBall)
+        else if(ball->getPosX() - BALL_SIZE < -zWidthAtBall)
             ballVelocs[i].x = abs(ballVelocs[i].x);
 
-        if(entity->getPosY() > zHeightAtBall)
-            ballVelocs[i].y = -abs(ballVelocs[i].y);
-        else if(entity->getPosY() < -zHeightAtBall){
+        //If the ball falls off the bottom
+        if(ball->getPosY() < -zHeightAtBall){
             ballVelocs[i].y = abs(ballVelocs[i].y);
             ballVelocs.erase(ballVelocs.begin() + i);
             ballEntities.erase(ballEntities.begin() + i);
@@ -255,53 +279,27 @@ void update(void) {
 
         //Check for collisions with other balls
         for(int j = i + 1; j < ballEntities.size(); j++) {
-            Entity* ent1 = ballEntities[i];
-            Entity* ent2 = ballEntities[j];
+            Entity* ball1 = ballEntities[i];
+            Entity* ball2 = ballEntities[j];
             float collisionDepth = 0.0f;
 
             //If the balls are colliding
-            if(ballsColliding(ent1->getPosition(), ent2->getPosition(), &collisionDepth)) {
-                vec3 pos1 = ent1->getPosition();
-                vec3 pos2 = ent2->getPosition();
+            if(ballsColliding(ball1->getPosition(), ball2->getPosition(), &collisionDepth)) {
+                vec3 pos1 = ball1->getPosition();
+                vec3 pos2 = ball2->getPosition();
 
                 collisionReaction(&pos1, &ballVelocs[i], &pos2, &ballVelocs[j], collisionDepth);         
                 
-                ent1->setPosition(pos1);
-                ent2->setPosition(pos2);
+                ball1->setPosition(pos1);
+                ball2->setPosition(pos2);
             }
         }
-    }
 
-    for(int i = 0; i < ballEntities.size(); i++) {
-        Entity* ball = ballEntities[i];
-
+        //Handle collisions with pegs
         handlePegCollisions(&peg3Entities, ball, i, pegPolyModel3);
         handlePegCollisions(&peg4Entities, ball, i, pegPolyModel4);
         handlePegCollisions(&peg5Entities, ball, i, pegPolyModel5);
         handlePegCollisions(&peg6Entities, ball, i, pegPolyModel6);
-        // for(int j = 0; j < peg3Entities.size(); j++) {
-        //     Entity* peg = peg3Entities[j];
-
-        //     vec2 collisionNormal;
-        //     vec2 pegPos = vec2(peg->getPosX(), peg->getPosY());
-        //     vec2 ballPos = vec2(ball->getPosX(), ball->getPosY());
-        //     vec2 ballVel = vec2(ballVelocs[i].x, ballVelocs[i].y);
-
-        //     if(circleCollidingPoly(ballPos, BALL_SIZE, pegPos, pegPolyModel3.vertices2D, 
-        //         pegPolyModel3.normals2D, &collisionNormal)) {
-
-        //         //Perform the collision reaction
-        //         collisionReactionStatic(&ballPos, &ballVel, pegPos, collisionNormal);
-        //         ball->setPosX(ballPos.x);
-        //         ball->setPosY(ballPos.y);
-        //         ballVelocs[i].x = ballVel.x;
-        //         ballVelocs[i].y = ballVel.y;
-
-        //         //Remove the peg
-        //         peg3Entities.erase(peg3Entities.begin() + j);
-        //         j--;
-        //     }
-        // }
     }
 }
 
@@ -313,6 +311,7 @@ void display(void) {
     backShader.setLightColor(LIGHT_COLOR);
     backShader.setLightPosition(LIGHT_POS);
     backShader.setAmbientLight(3.8f * LIGHT_AMBIENT);
+    //Render the backdrop
     backdrop.render();
 
     staticShader.start();
@@ -321,7 +320,10 @@ void display(void) {
     staticShader.setLightColor(LIGHT_COLOR);
     staticShader.setLightPosition(LIGHT_POS);
     staticShader.setAmbientLight(0.7f * LIGHT_AMBIENT);
+    staticShader.setTime(getTimeSec());
+    staticShader.setUseAnimatedTextures(true);
     
+    //Render any entities
 	renderer.render(entities);
 }
 

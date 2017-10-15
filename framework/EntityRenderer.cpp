@@ -20,12 +20,13 @@ void EntityRenderer::render(unordered_map<GLuint, vector<Entity*>*> entitiesMap)
 			TexturedModel* texModel = mapEntry->second[0][0]->getModel();
 			prepareTexturedModel(texModel);
 
+
 			const unsigned nEntities = mapEntry->second[0].size();
 			//Iterate through the entities in this entity list		
 			for (unsigned int i = 0; i < nEntities; i++) {
 				//Get the entity
-				Entity* entity = mapEntry->second[0][i];
-
+				Entity* entity = mapEntry->second[0][i];	
+				
 				//Prepare each entity for drawing (binding transfromations etc)
 				prepareInstance(entity);
 
@@ -86,6 +87,10 @@ void EntityRenderer::prepareInstance(Entity* entity) {
 	staticShader->setTransformationMatrix(transMatrix);
 
 	staticShader->setTextureAtlasOffsets(entity->getTextureOffset());
+
+	//Bind the texture to the texture unit 0
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, entity->getModel()->getTexture()->getTextureID());
 }
 
 void EntityRenderer::unbindTexturedModel() {

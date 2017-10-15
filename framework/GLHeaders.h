@@ -10,7 +10,7 @@
 #define GL_GLEXT_PROTOTYPES
 //Forces GLM to use radians
 #define GLM_FORCE_RADIANS
-//Allows use of vector projections
+//Allows use of vector projections and vector rotations
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include <GL/gl.h>
@@ -24,6 +24,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/projection.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+
 
 #include "SOIL.h"
 

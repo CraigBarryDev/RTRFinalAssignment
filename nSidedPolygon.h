@@ -18,8 +18,6 @@ public:
 
     vector<vec2> vertices2D;
     vector<vec2> normals2D;
-    // vector<GLfloat> vertices2D;
-    // vector<GLfloat> normals2D;
 };
 
 #endif

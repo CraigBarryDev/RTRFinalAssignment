@@ -52,6 +52,14 @@ void StaticShader::setTextureAtlasSize(vec2 size) {
 	setUniform("texAtlasSize", size);
 }
 
+void StaticShader::setTime(float time) {
+	setUniform("time", time);
+}
+
+void StaticShader::setUseAnimatedTextures(bool animateTextures) {
+	setUniform("useAnimatedTextures", animateTextures);
+}
+
 void StaticShader::bindAttributes() {
 	bindAttribute(0, "position");
 	bindAttribute(1, "textureCoords");

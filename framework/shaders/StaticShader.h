@@ -17,6 +17,8 @@ public:
 	void setShineVariables(float damper, float reflection);
 	void setUseFakeLighting(bool useFakeLighting);
 	void setSkyColour(vec3 skyColor);
+	void setTime(float time);
+	void setUseAnimatedTextures(bool animateTextures);
 
 	void setTextureAtlasOffsets(vec2 offsets);
 	void setTextureAtlasSize(vec2 size);

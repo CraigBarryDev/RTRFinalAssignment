@@ -62,8 +62,7 @@ NSidedPolygon::NSidedPolygon(unsigned int nSides, float depth, float radius) {
         addVec(&texCoords, vec2(0.0f, 0.0f));
         addVec(&texCoords, vec2(0.0f, 0.0f));
 
-        // addVec(&vertices2D, vec2(x1, y1));
-        // if(i != nSides - 1) addVec(&normals2D, vec2(normal.x, normal.y));
+        //Add 2D vertices and normals for collision detections
         vertices2D.push_back(vec2(x1,y1));
         if(i != nSides -1) normals2D.push_back(vec2(normal.x, normal.y));
     }

@@ -8,6 +8,9 @@ StaticShader staticShader;
 BackdropShader backShader;
 //Textures
 ModelTexture* ballTexture;
+ModelTexture* blueTexture;
+ModelTexture* greenTexture;
+ModelTexture* orangeTexture;
 ModelTexture* woodTexture;
 ModelTexture* cannonTexture;
 //Models
@@ -38,11 +41,17 @@ void cleanUpShaders() {
 
 //Loads textures
 void initTextures() {
+	blueTexture = new ModelTexture(loader->loadTexture("textures/blue.jpg"));
+
 	ballTexture = new ModelTexture(loader->loadTexture("textures/metal.jpg"));
 	ballTexture->setShineDamper(10.0f);
     ballTexture->setReflectivity(0.8f);
 
 	cannonTexture = new ModelTexture(loader->loadTexture("textures/cannon.jpg"));
+
+	greenTexture = new ModelTexture(loader->loadTexture("textures/green.jpg"));
+
+	orangeTexture = new ModelTexture(loader->loadTexture("textures/orange.jpg"));
 
 	woodTexture = new ModelTexture(loader->loadTexture("textures/wood.png"));
 	woodTexture->setShineDamper(25.0f);
@@ -52,7 +61,10 @@ void initTextures() {
 //Unloads textures
 void cleanUpTextures() {
 	delete ballTexture;
+	delete blueTexture;
 	delete cannonTexture;
+	delete greenTexture;
+	delete orangeTexture;
 	delete woodTexture;
 }
 
