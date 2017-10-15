@@ -55,7 +55,6 @@ void init(void) {
 
 void addPeg(vec3 pos) {
     int nSides = Maths::randBetween(3,7);
-    nSides =3;
     RawModel* raw;
     switch(nSides) {
         case 3:
@@ -68,7 +67,6 @@ void addPeg(vec3 pos) {
             raw = pegPoly6; break;
     }
     
-    printf("VAO ID: %d\n", raw->getVAOID());
     TexturedModel* polyTexModel = new TexturedModel(raw, woodTexture);
     Entity* ent = new Entity(polyTexModel);
     ent->setPosition(pos);
@@ -83,8 +81,6 @@ void addPeg(vec3 pos) {
         case 6:
             peg6Entities.push_back(ent); break;
     }
-
-    printf("PEG ENTITIY ADDED\n");
 }
 
 void addCannonBall(vec3 pos, vec3 vel) {
@@ -121,7 +117,6 @@ void sphereCollisionReactionStatic(vec2* pos, vec2* vel, vec2 staticPos, float c
     vec2 collisionNormal = normalize(staticPos - *pos);
     *pos += collisionDepth * collisionNormal;
     *vel = reflect(*vel, collisionNormal);
-    // *vel = -collisionNormal * BALL_SPEED;
 }
 
 void collisionReactionStatic(vec2* pos, vec2* vel, vec2 staticPos, vec2 collisionNormal) {
@@ -200,6 +195,32 @@ bool circleCollidingPoly(vec2 cPos, float cRadius, vec2 posOffset, vector<vec2> 
     return false;
 }
 
+void handlePegCollisions(std::vector<Entity*>* pegs, Entity* ball, int ballIndex, NSidedPolygon& polyModel) {
+    for(int j = 0; j < pegs->size(); j++) {
+        Entity* peg = pegs[0][j];
+
+        vec2 collisionNormal;
+        vec2 pegPos = vec2(peg->getPosX(), peg->getPosY());
+        vec2 ballPos = vec2(ball->getPosX(), ball->getPosY());
+        vec2 ballVel = vec2(ballVelocs[ballIndex].x, ballVelocs[ballIndex].y);
+
+        if(circleCollidingPoly(ballPos, BALL_SIZE, pegPos, polyModel.vertices2D, 
+            polyModel.normals2D, &collisionNormal)) {
+
+            //Perform the collision reaction
+            collisionReactionStatic(&ballPos, &ballVel, pegPos, collisionNormal);
+            ball->setPosX(ballPos.x);
+            ball->setPosY(ballPos.y);
+            ballVelocs[ballIndex].x = ballVel.x;
+            ballVelocs[ballIndex].y = ballVel.y;
+
+            //Remove the peg
+            pegs[0].erase(pegs->begin() + j);
+            j--;
+        }
+    }
+}
+
 //Update function called before each draw call to update program state
 void update(void) {
     handleMouse();
@@ -232,7 +253,7 @@ void update(void) {
             ballEntities.erase(ballEntities.begin() + i);
         }
 
-        //Check for collisions
+        //Check for collisions with other balls
         for(int j = i + 1; j < ballEntities.size(); j++) {
             Entity* ent1 = ballEntities[i];
             Entity* ent2 = ballEntities[j];
@@ -254,91 +275,33 @@ void update(void) {
     for(int i = 0; i < ballEntities.size(); i++) {
         Entity* ball = ballEntities[i];
 
-        for(int j = 0; j < peg3Entities.size(); j++) {
-            Entity* peg = peg3Entities[j];
+        handlePegCollisions(&peg3Entities, ball, i, pegPolyModel3);
+        handlePegCollisions(&peg4Entities, ball, i, pegPolyModel4);
+        handlePegCollisions(&peg5Entities, ball, i, pegPolyModel5);
+        handlePegCollisions(&peg6Entities, ball, i, pegPolyModel6);
+        // for(int j = 0; j < peg3Entities.size(); j++) {
+        //     Entity* peg = peg3Entities[j];
 
-            vec2 collisionNormal;
-            vec2 pegPos = vec2(peg->getPosX(), peg->getPosY());
-            vec2 ballPos = vec2(ball->getPosX(), ball->getPosY());
-            vec2 ballVel = vec2(ballVelocs[i].x, ballVelocs[i].y);
+        //     vec2 collisionNormal;
+        //     vec2 pegPos = vec2(peg->getPosX(), peg->getPosY());
+        //     vec2 ballPos = vec2(ball->getPosX(), ball->getPosY());
+        //     vec2 ballVel = vec2(ballVelocs[i].x, ballVelocs[i].y);
 
-            if(circleCollidingPoly(ballPos, BALL_SIZE, pegPos, pegPolyModel3.vertices2D, 
-                pegPolyModel3.normals2D, &collisionNormal)) {
+        //     if(circleCollidingPoly(ballPos, BALL_SIZE, pegPos, pegPolyModel3.vertices2D, 
+        //         pegPolyModel3.normals2D, &collisionNormal)) {
 
-                    collisionReactionStatic(&ballPos, &ballVel, pegPos, collisionNormal);
-                    ball->setPosX(ballPos.x);
-                    ball->setPosY(ballPos.y);
-                    ballVelocs[i].x = ballVel.x;
-                    ballVelocs[i].y = ballVel.y;
+        //         //Perform the collision reaction
+        //         collisionReactionStatic(&ballPos, &ballVel, pegPos, collisionNormal);
+        //         ball->setPosX(ballPos.x);
+        //         ball->setPosY(ballPos.y);
+        //         ballVelocs[i].x = ballVel.x;
+        //         ballVelocs[i].y = ballVel.y;
 
-                    //Remove the peg
-                    peg3Entities.erase(peg3Entities.begin() + j);
-                    j--;
-            }
-            // for(int k = 0; k < pegPolyModel3.vertices2D.size() - 1; k++) {
-                
-
-
-                
-
-                // if(circleCollidingVertex(ballPos,
-                //     BALL_SIZE,
-                //     pegPos + pegPolyModel3.vertices2D[k],
-                //     &collisionNormal)) {
-
-                //     printf("CollisionNormal: <%f, %f>\n", collisionNormal.x, collisionNormal.y);
-
-                //     collisionReactionStatic(&ballPos, &ballVel, pegPos, collisionNormal);
-                //     ball->setPosX(ballPos.x);
-                //     ball->setPosY(ballPos.y);
-                //     ballVelocs[i].x = ballVel.x;
-                //     ballVelocs[i].y = ballVel.y;
-
-                //     printf("REMOVING PEG (%d)\n", j);
-
-                //     //Remove the peg
-                //     peg3Entities.erase(peg3Entities.begin() + j);
-                //     j--;
-
-                //     printf("PEG REMOVED\n");
-                //     break;
-                // }
-
-            //     if(circleCollidingLine(ballPos, BALL_SIZE, 
-            //         pegPos + pegPolyModel3.vertices2D[k],
-            //         pegPos + pegPolyModel3.vertices2D[k + 1],
-            //         pegPolyModel3.normals2D[k],
-            //         &collisionNormal)) {
-
-            //         printf("CollisionNormal: <%f, %f>\n", collisionNormal.x, collisionNormal.y);
-
-            //         collisionReactionStatic(&ballPos, &ballVel, pegPos, collisionNormal);
-            //         ball->setPosX(ballPos.x);
-            //         ball->setPosY(ballPos.y);
-            //         ballVelocs[i].x = ballVel.x;
-            //         ballVelocs[i].y = ballVel.y;
-
-            //         printf("REMOVING PEG (%d)\n", j);
-
-            //         //Remove the peg
-            //         peg3Entities.erase(peg3Entities.begin() + j);
-            //         j--;
-
-            //         printf("PEG REMOVED\n");
-            //         break;
-            //     }
-            // }
-            
-            // vec2 collisionNormal;
-            // if(circleCollidingPoly(vec2(ball->getPosition().x, ball->getPosition().y),
-            //     BALL_SIZE,
-            //     pegPolyModel3.vertices2D,
-            //     pegPolyModel3.normals2D,
-            //     &collisionNormal)) {
-
-            //     printf("CollisionNormal: <%f, %f>\n", collisionNormal.x, collisionNormal.y);
-            // }
-        }
+        //         //Remove the peg
+        //         peg3Entities.erase(peg3Entities.begin() + j);
+        //         j--;
+        //     }
+        // }
     }
 }
 
