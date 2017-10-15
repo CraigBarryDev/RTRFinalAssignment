@@ -1,8 +1,6 @@
 #include "main.h"
 
-void handleMouse() {
-
-}
+void handleMouse() {}
 
 void handleKeyboard() {
     if(glKeys->isPressed('a')){

@@ -67,6 +67,9 @@ void EntityRenderer::prepareTexturedModel(TexturedModel* model) {
 	//Set the texture atlas size
 	staticShader->setTextureAtlasSize(vec2(modelTex->getTextureAtlasSizeX(), modelTex->getTextureAtlasSizeY()));
 
+	//Set whether the texture is animated
+	staticShader->setUseAnimatedTextures(modelTex->getIsAnimated());
+
 	//Bind the texture to the texture unit 0
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, modelTex->getTextureID());

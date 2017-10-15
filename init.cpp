@@ -42,6 +42,7 @@ void cleanUpShaders() {
 //Loads textures
 void initTextures() {
 	blueTexture = new ModelTexture(loader->loadTexture("textures/blue.jpg"));
+	blueTexture->setIsAnimated(true);
 
 	ballTexture = new ModelTexture(loader->loadTexture("textures/metal.jpg"));
 	ballTexture->setShineDamper(10.0f);
@@ -50,8 +51,10 @@ void initTextures() {
 	cannonTexture = new ModelTexture(loader->loadTexture("textures/cannon.jpg"));
 
 	greenTexture = new ModelTexture(loader->loadTexture("textures/green.jpg"));
+	greenTexture->setIsAnimated(true);
 
 	orangeTexture = new ModelTexture(loader->loadTexture("textures/orange.jpg"));
+	orangeTexture->setIsAnimated(true);
 
 	woodTexture = new ModelTexture(loader->loadTexture("textures/wood.png"));
 	woodTexture->setShineDamper(25.0f);

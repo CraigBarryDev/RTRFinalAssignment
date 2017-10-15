@@ -321,7 +321,6 @@ void display(void) {
     staticShader.setLightPosition(LIGHT_POS);
     staticShader.setAmbientLight(0.7f * LIGHT_AMBIENT);
     staticShader.setTime(getTimeSec());
-    staticShader.setUseAnimatedTextures(true);
     
     //Render any entities
 	renderer.render(entities);
