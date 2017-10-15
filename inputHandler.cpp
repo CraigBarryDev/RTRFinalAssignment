@@ -1,11 +1,16 @@
 #include "main.h"
 
 void printControls() {
-    printf("A/Left:  Move cannon left\n");
-    printf("D/Right: Move cannon right\n");
-    printf("Space:   Fires ball\n");
-    printf("S:       Adds a random peg\n");
-    printf("R:       Resets the level\n");
+    printf("******************************\n");
+    printf(" PEGGLE - RTR ASSIGNMENT 3\n");
+    printf("******************************\n");
+    printf("-----------Controls-----------\n");
+    printf("A/Left:    Move cannon left\n");
+    printf("D/Right:   Move cannon right\n");
+    printf("Space:     Fires ball\n");
+    printf("S:         Adds a random peg\n");
+    printf("R:         Resets the level\n");
+    printf("------------------------------\n");
 }
 
 void handleMouse() {}

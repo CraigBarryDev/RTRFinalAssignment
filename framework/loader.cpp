@@ -154,9 +154,6 @@ GLuint Loader::loadTexture(std::string filename, bool hasAlphaChannel) {
 
 	//Unbind the texture
 	glBindTexture(GL_TEXTURE_2D, 0);
-
-	printf("TEXTURE ID:%d\n", texture);
-
 	return texture;
 }
 

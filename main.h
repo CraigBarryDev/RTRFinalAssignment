@@ -33,6 +33,7 @@ void addPeg(vec3 pos, vec3 angularVeloc);
 void clearBalls();
 void clearPegs();
 void setupLevel();
+void printControls();
 
 void handleMouse();
 void handleKeyboard();
