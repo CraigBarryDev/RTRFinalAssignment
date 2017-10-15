@@ -11,4 +11,5 @@ entity(ent)
 
 void Peg::update() {
 	entity->increaseRotation(angularVelocity * getFrameTime());
+	entity->increasePosition(velocity * getFrameTime());
 }

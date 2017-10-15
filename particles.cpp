@@ -24,7 +24,7 @@ texture(particleTexture)
 	vecAdd(&verts, vec3(-1.0f, 1.0f, 0.0f));
 	vecAdd(&verts, vec3(-1.0f, -1.0f, 0.0f));
 	vecAdd(&verts, vec3(1.0f, -1.0f, 0.0f));
-
+	
 	vector<GLfloat> texCoords;
 	vecAdd(&texCoords, vec2(1.0f, 1.0f));
 	vecAdd(&texCoords, vec2(0.0f, 1.0f));
@@ -35,10 +35,9 @@ texture(particleTexture)
 	indices.push_back(0);
 	indices.push_back(1);
 	indices.push_back(2);
-	
 	indices.push_back(3);
-	indices.push_back(0);
 	indices.push_back(2);
+	indices.push_back(0);
 
 	pModel = loader->loadToVAO(verts, texCoords, indices);
 	vao = pModel->getVAOID();

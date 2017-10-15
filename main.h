@@ -30,6 +30,9 @@
 
 void addCannonBall(vec3 pos, vec3 vel);
 void addPeg(vec3 pos, vec3 angularVeloc);
+void clearBalls();
+void clearPegs();
+void setupLevel();
 
 void handleMouse();
 void handleKeyboard();

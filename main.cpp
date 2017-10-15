@@ -9,6 +9,32 @@ vector<vec3> ballVelocs;
 vector<Peg> pegs;
 vector<Particles> particleSystems;
 
+#define N_PEGS 100
+
+void setupLevel() {
+    //Print the controls for the user
+    printControls();
+    //Iterate through the number of pegs in a level
+    for(int i = 0; i < N_PEGS; i++) {
+        //Add random pegs to the level
+        addPeg(vec3(Maths::randBetweenf(-18.0f, 18.0f), Maths::randBetweenf(-15.0f, 5.0f), GAME_Z),
+            vec3(0.0f, 0.0f, Maths::randBetweenf(-30.0f, 30.0f)));
+    }
+}
+
+void clearPegs() {
+    pegs.clear();
+    peg3Entities.clear();
+    peg4Entities.clear();
+    peg5Entities.clear();
+    peg6Entities.clear();
+}
+
+void clearBalls() {
+    ballVelocs.clear();
+    ballEntities.clear();
+}
+
 //Main initialization
 void init(void) {
 	//Creates the loading object
@@ -19,6 +45,9 @@ void init(void) {
     initShaders();
     initModels();
     initRenderer();
+
+    //Setup the level
+    setupLevel();
 }
 
 void addPeg(vec3 pos, vec3 angularVeloc) {

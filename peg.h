@@ -19,6 +19,7 @@ public:
 	const vec3 getAngularVeloc() { return angularVelocity; }
 private:
 	vec3 angularVelocity = vec3(0.0f);
+	vec3 velocity = vec3(0.0f);
 	Entity* entity;
 	int nSides = 0;
 };
